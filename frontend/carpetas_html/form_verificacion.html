@@ -1,0 +1,226 @@
+<!doctype html>
+
+<html class="dark" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>LoveARt Email Verification</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#8b5cf6", // Electric Violet
+              "hologram-cyan": "#06b6d4",
+              "love-magenta": "#d946ef",
+              "background-light": "#f6f5f8",
+              "background-dark": "#030014", // Deep Void
+            },
+            fontFamily: {
+              display: ["Space Grotesk", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              "2xl": "1rem",
+              full: "9999px",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body {
+        font-family: "Space Grotesk", sans-serif;
+        -webkit-tap-highlight-color: transparent;
+      }
+      /* Custom glow for the active input */
+      .otp-input:focus {
+        box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
+        border-color: #06b6d4 !important;
+      }
+      /* Glassmorphism effect for the container */
+      .glass-panel {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+    </style>
+    <style>
+      body {
+        min-height: max(884px, 100dvh);
+      }
+    </style>
+  </head>
+  <body
+    class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col items-center justify-center p-6"
+  >
+    <!-- Top Navigation / Status Bar Area -->
+    <div
+      class="fixed top-0 left-0 w-full p-4 flex justify-between items-center z-50"
+    >
+      <button class="p-2 text-slate-400 hover:text-white transition-colors">
+        <span class="material-symbols-outlined">arrow_back_ios</span>
+      </button>
+      <div class="w-10"></div>
+      <!-- Spacer for symmetry -->
+    </div>
+    <!-- Main Content Container -->
+    <div class="w-full max-w-md flex flex-col items-center space-y-12">
+      <!-- Branding Section -->
+      <div class="flex flex-col items-center space-y-6">
+        <div
+          class="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center relative overflow-hidden group"
+        >
+          <!-- Glowing Aura -->
+          <div
+            class="absolute inset-0 bg-primary/30 blur-xl opacity-50 group-hover:opacity-100 transition-opacity"
+          ></div>
+          <span
+            class="material-symbols-outlined text-primary text-5xl relative z-10"
+            style="
+              font-variation-settings:
+                &quot;FILL&quot; 1,
+                &quot;wght&quot; 400,
+                &quot;GRAD&quot; 0,
+                &quot;opsz&quot; 48;
+            "
+            >favorite</span
+          >
+        </div>
+        <div class="text-center space-y-2">
+          <h1
+            class="text-3xl font-bold tracking-tight text-primary font-display"
+          >
+            Verify Email
+          </h1>
+          <p
+            class="text-slate-400 max-w-[280px] mx-auto text-sm leading-relaxed"
+          >
+            A 6-digit authentication code has been sent to your inbox. Enter it
+            to activate your studio.
+          </p>
+        </div>
+      </div>
+      <!-- Verification Form Section -->
+      <div class="w-full space-y-10">
+        <!-- 6-Digit Code Input Row -->
+        <div class="flex justify-between gap-2 sm:gap-4 px-2">
+          <!-- Each input box -->
+          <input
+            class="otp-input w-12 h-16 sm:w-14 sm:h-20 text-center text-2xl font-bold bg-white/5 border-2 border-slate-800 rounded-xl focus:outline-none transition-all duration-200 text-hologram-cyan placeholder-slate-700"
+            maxlength="1"
+            placeholder="-"
+            type="text"
+          />
+          <input
+            class="otp-input w-12 h-16 sm:w-14 sm:h-20 text-center text-2xl font-bold bg-white/5 border-2 border-slate-800 rounded-xl focus:outline-none transition-all duration-200 text-hologram-cyan placeholder-slate-700"
+            maxlength="1"
+            placeholder="-"
+            type="text"
+          />
+          <input
+            class="otp-input w-12 h-16 sm:w-14 sm:h-20 text-center text-2xl font-bold bg-white/5 border-2 border-slate-800 rounded-xl focus:outline-none transition-all duration-200 text-hologram-cyan placeholder-slate-700"
+            maxlength="1"
+            placeholder="-"
+            type="text"
+          />
+          <input
+            class="otp-input w-12 h-16 sm:w-14 sm:h-20 text-center text-2xl font-bold bg-white/5 border-2 border-slate-800 rounded-xl focus:outline-none transition-all duration-200 text-hologram-cyan placeholder-slate-700"
+            maxlength="1"
+            placeholder="-"
+            type="text"
+          />
+          <input
+            class="otp-input w-12 h-16 sm:w-14 sm:h-20 text-center text-2xl font-bold bg-white/5 border-2 border-slate-800 rounded-xl focus:outline-none transition-all duration-200 text-hologram-cyan placeholder-slate-700"
+            maxlength="1"
+            placeholder="-"
+            type="text"
+          />
+          <input
+            class="otp-input w-12 h-16 sm:w-14 sm:h-20 text-center text-2xl font-bold bg-white/5 border-2 border-slate-800 rounded-xl focus:outline-none transition-all duration-200 text-hologram-cyan placeholder-slate-700"
+            maxlength="1"
+            placeholder="-"
+            type="text"
+          />
+        </div>
+        <!-- Action Button -->
+        <div class="px-2">
+          <button
+            class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-xl shadow-[0_0_20px_rgba(139,92,246,0.3)] transition-all active:scale-[0.98] flex items-center justify-center gap-2 group"
+          >
+            <span>Verify</span>
+            <span
+              class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform"
+              >arrow_forward</span
+            >
+          </button>
+        </div>
+      </div>
+      <!-- Footer / Resend Section -->
+      <div class="flex flex-col items-center space-y-4 pt-4">
+        <p class="text-slate-500 text-xs tracking-widest uppercase">
+          Didn't receive a code?
+        </p>
+        <div class="flex items-center space-x-3">
+          <button
+            class="text-love-magenta font-semibold hover:opacity-80 transition-opacity"
+          >
+            Resend Code
+          </button>
+          <div class="w-1 h-1 bg-slate-700 rounded-full"></div>
+          <div
+            class="flex items-center gap-1.5 text-slate-400 font-mono text-sm"
+          >
+            <span class="material-symbols-outlined text-base">timer</span>
+            <span>00:59</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Futuristic Decorative Elements -->
+    <div
+      class="fixed -bottom-20 -left-20 w-64 h-64 bg-primary/10 rounded-full blur-[100px] pointer-events-none"
+    ></div>
+    <div
+      class="fixed -top-20 -right-20 w-64 h-64 bg-hologram-cyan/10 rounded-full blur-[100px] pointer-events-none"
+    ></div>
+    <!-- Numeric Keyboard Hint (Simulation) -->
+    <div
+      class="fixed bottom-0 w-full max-w-md glass-panel p-2 rounded-t-3xl border-t border-white/10 mt-auto hidden sm:block"
+    >
+      <div class="grid grid-cols-3 gap-1 text-center py-2">
+        <div class="py-4 text-xl font-medium text-slate-300">1</div>
+        <div class="py-4 text-xl font-medium text-slate-300">2</div>
+        <div class="py-4 text-xl font-medium text-slate-300">3</div>
+        <div class="py-4 text-xl font-medium text-slate-300">4</div>
+        <div class="py-4 text-xl font-medium text-slate-300">5</div>
+        <div class="py-4 text-xl font-medium text-slate-300">6</div>
+        <div class="py-4 text-xl font-medium text-slate-300">7</div>
+        <div class="py-4 text-xl font-medium text-slate-300">8</div>
+        <div class="py-4 text-xl font-medium text-slate-300">9</div>
+        <div></div>
+        <div class="py-4 text-xl font-medium text-slate-300">0</div>
+        <div class="py-4 flex items-center justify-center text-slate-500">
+          <span class="material-symbols-outlined">backspace</span>
+        </div>
+      </div>
+      <div class="h-1 w-32 bg-slate-800 mx-auto mt-2 mb-4 rounded-full"></div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,182 @@
+<!doctype html>
+
+<html class="dark" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>LoveARt - Verify Your Account</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#895af6",
+              "background-light": "#f6f5f8",
+              "background-dark": "#030014", // Deep Void
+              "hologram-cyan": "#06b6d4",
+              "love-magenta": "#d946ef",
+            },
+            fontFamily: {
+              display: ["Space Grotesk", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              full: "9999px",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body {
+        font-family: "Space Grotesk", sans-serif;
+      }
+      .glow-violet {
+        box-shadow: 0 0 20px rgba(137, 90, 246, 0.3);
+      }
+      .glow-cyan {
+        box-shadow: 0 0 15px rgba(6, 182, 212, 0.2);
+      }
+      .text-glow-magenta {
+        text-shadow: 0 0 10px rgba(217, 70, 239, 0.4);
+      }
+    </style>
+    <style>
+      body {
+        min-height: max(884px, 100dvh);
+      }
+    </style>
+  </head>
+  <body
+    class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex items-center justify-center p-4"
+  >
+    <div
+      class="max-w-[480px] w-full bg-slate-50 dark:bg-background-dark/50 border border-slate-200 dark:border-primary/20 rounded-xl overflow-hidden shadow-2xl"
+    >
+      <!-- Top Bar / Logo -->
+      <div class="flex flex-col items-center pt-10 pb-6 px-6">
+        <div
+          class="flex items-center justify-center size-16 rounded-full bg-primary/10 border border-primary/30 mb-4 glow-violet"
+        >
+          <span
+            class="material-symbols-outlined text-primary text-4xl"
+            style="font-variation-settings: &quot;FILL&quot; 1"
+          >
+            favorite
+          </span>
+        </div>
+        <h2
+          class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2"
+        >
+          Love<span class="text-primary">ARt</span>
+        </h2>
+      </div>
+      <!-- Hero Image Placeholder -->
+      <div class="px-6">
+        <div
+          class="w-full aspect-video bg-slate-200 dark:bg-slate-800 rounded-lg overflow-hidden relative group"
+          data-alt="Abstract colorful holographic liquid art pattern"
+          style="
+            background-image: url(&quot;https://lh3.googleusercontent.com/aida-public/AB6AXuDpbJrDgdxviTA4xyKPXRU01E51lQRka0kEYKrWfm142Tyu3xniMcPP8svA7r3VrAY9-U5bMXRIugKLWglBwqA6z5MnwQnjnGx1HJDtcZVQgPpFCytPk6LIKsFabGBGN-iwcyHtz0aORbnT_33sAX9UEEC4R5GXqoYXj9ovU-wfB-FQ9rzbROVGFPvVnlwuAysFfcakV2WJRkDYfJuadTwlvYWPsGr9TjUqZol75y3w-P9tZY0ih5bO_zQ-Ur8Bj1uEoj0Xo6JsWg7u&quot;);
+            background-size: cover;
+            background-position: center;
+          "
+        >
+          <div
+            class="absolute inset-0 bg-gradient-to-t from-background-dark via-transparent to-transparent opacity-60"
+          ></div>
+        </div>
+      </div>
+      <!-- Content Section -->
+      <div class="px-8 pt-8 pb-10 text-center">
+        <h1
+          class="text-3xl font-bold leading-tight mb-4 text-primary dark:text-primary"
+        >
+          Welcome to the Future of Art
+        </h1>
+        <p
+          class="text-slate-600 dark:text-slate-300 text-base leading-relaxed mb-8"
+        >
+          Your journey into the infinite begins here. Transform your physical
+          world into a digital masterpiece with one tap. Please verify your
+          email to unlock full access to the AR Studio.
+        </p>
+        <!-- Primary Action -->
+        <div class="mb-10">
+          <button
+            class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 px-6 rounded-lg transition-all glow-violet flex items-center justify-center gap-2 text-lg"
+          >
+            <span>Verify My Account</span>
+            <span class="material-symbols-outlined">rocket_launch</span>
+          </button>
+        </div>
+        <!-- Secondary Code Box -->
+        <div
+          class="relative py-6 border-t border-slate-200 dark:border-white/5"
+        >
+          <p
+            class="text-xs uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 mb-4 font-medium"
+          >
+            Or enter this code manually
+          </p>
+          <div
+            class="inline-flex items-center justify-center gap-3 px-6 py-4 bg-hologram-cyan/5 border border-hologram-cyan/30 rounded-lg glow-cyan"
+          >
+            <span
+              class="text-2xl font-mono font-bold tracking-[0.3em] text-hologram-cyan"
+            >
+              842 901
+            </span>
+          </div>
+        </div>
+      </div>
+      <!-- Footer -->
+      <div class="bg-slate-100 dark:bg-white/5 px-8 py-10 text-center">
+        <div class="mb-6">
+          <h3
+            class="text-love-magenta font-bold italic text-xl tracking-wide text-glow-magenta mb-4"
+          >
+            Stay Creative
+          </h3>
+          <div
+            class="flex justify-center gap-4 text-xs text-slate-500 dark:text-slate-400"
+          >
+            <a class="hover:text-primary transition-colors" href="#"
+              >Privacy Policy</a
+            >
+            <span class="opacity-20">•</span>
+            <a class="hover:text-primary transition-colors" href="#"
+              >Terms of Service</a
+            >
+            <span class="opacity-20">•</span>
+            <a class="hover:text-primary transition-colors" href="#"
+              >Unsubscribe</a
+            >
+          </div>
+        </div>
+        <p
+          class="text-[10px] text-slate-400 dark:text-slate-600 uppercase tracking-widest leading-loose"
+        >
+          © 2024 LoveARt Studios Inc.<br />
+          Deep Void Headquarters, Neo-City
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

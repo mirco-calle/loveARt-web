@@ -1,0 +1,97 @@
+services:
+  db:
+    image: postgres:14.18
+    restart: always
+    container_name: postgresql
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    environment:
+      DATABASE_HOST: ${DATABASE_HOST}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - proyecto_network
+
+  # pgAdmin:
+  #   depends_on:
+  #     - db
+  #   container_name: pgadmin
+  #   image: dpage/pgadmin4:9.5.0
+  #   ports:
+  #     - "5000:80"
+  #   environment:
+  #     PGADMIN_DEFAULT_PASSWORD: ${POSTGRES_PASSWORD}
+  #     PGADMIN_DEFAULT_EMAIL: mirco@gmail.com
+  #   networks:
+  #     - proyecto_network
+
+  backend:
+    depends_on:
+      db:
+        condition: service_healthy
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: development
+    container_name: django
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./backend:/app
+      - ./backend/uploads:/app/uploads
+    ports:
+      - "8000:8000"
+    environment:
+      POSTGRES_NAME: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      DATABASE_HOST: ${DATABASE_HOST}
+      # Google OAuth Configuration
+      GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID}
+      GOOGLE_OAUTH_CLIENT_SECRET: ${GOOGLE_OAUTH_CLIENT_SECRET}
+      # Email sending via Gmail API (OAuth2)
+      EMAIL_BACKEND: ${EMAIL_BACKEND:-django.core.mail.backends.console.EmailBackend}
+      GMAIL_REFRESH_TOKEN: ${GMAIL_REFRESH_TOKEN:-}
+      DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL:-LoveArt <noreply@loveart.app>}
+      # AWS S3 Configuration
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_STORAGE_BUCKET_NAME: ${AWS_STORAGE_BUCKET_NAME}
+      AWS_S3_REGION_NAME: ${AWS_S3_REGION_NAME}
+      AWS_S3_CUSTOM_DOMAIN: ${AWS_S3_CUSTOM_DOMAIN}
+
+    networks:
+      - proyecto_network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: development
+    container_name: proyecto_frontend_dev
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+    command: yarn dev --host
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:8000/api
+      - VITE_GOOGLE_OAUTH_CLIENT_ID=${VITE_GOOGLE_OAUTH_CLIENT_ID}
+    networks:
+      - proyecto_network
+    stdin_open: true
+    tty: true
+
+networks:
+  proyecto_network:
+    driver: bridge
+
+volumes:
+  volumen_post:
