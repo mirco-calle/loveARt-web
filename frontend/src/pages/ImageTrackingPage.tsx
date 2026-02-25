@@ -18,6 +18,7 @@ interface UploadState {
   videoFile: File | null;
   isPublic: boolean;
   imagePreview: string | null;
+  aspectRatio: "16:9" | "9:16";
   uploading: boolean;
   progress: number;
 }
@@ -28,6 +29,7 @@ export default function ImageTrackingPage() {
     videoFile: null,
     isPublic: false,
     imagePreview: null,
+    aspectRatio: "16:9",
     uploading: false,
     progress: 0,
   });
@@ -71,6 +73,7 @@ export default function ImageTrackingPage() {
       const imageData = new FormData();
       imageData.append("image", state.imageFile);
       imageData.append("title", state.imageFile.name);
+      imageData.append("aspect_ratio", state.aspectRatio);
       imageData.append("is_public", String(state.isPublic));
 
       setState((prev) => ({ ...prev, progress: 30 }));
@@ -99,12 +102,17 @@ export default function ImageTrackingPage() {
           videoFile: null,
           isPublic: false,
           imagePreview: null,
+          aspectRatio: "16:9",
           uploading: false,
           progress: 0,
         });
       }, 1000);
-    } catch {
-      toast.error("Error al subir. Intenta de nuevo.");
+    } catch (error: any) {
+      console.error("Error al subir:", error);
+      const serverMsg = error.response?.data
+        ? JSON.stringify(error.response.data)
+        : "Error al subir. Intenta de nuevo.";
+      toast.error(`Error: ${serverMsg}`);
       setState((prev) => ({ ...prev, uploading: false, progress: 0 }));
     }
   };
@@ -125,6 +133,91 @@ export default function ImageTrackingPage() {
         </p>
       </motion.div>
 
+      {/* Aspect Ratio Selector - Compact Version */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="flex flex-col sm:flex-row items-start sm:items-center gap-3 bg-white/2 p-3 px-4 rounded-2xl border border-white/5"
+      >
+        <div className="flex items-center gap-2 text-slate-400">
+          <span className="text-xs font-bold uppercase tracking-widest">
+            Relación:
+          </span>
+        </div>
+
+        <div className="flex gap-1.5">
+          <button
+            type="button"
+            onClick={() =>
+              setState((prev) => ({ ...prev, aspectRatio: "16:9" }))
+            }
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all duration-300 ${
+              state.aspectRatio === "16:9"
+                ? "bg-cyan-500/10 border-cyan-500/40 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
+                : "bg-white/2 border-white/5 text-slate-500 hover:bg-white/5"
+            }`}
+          >
+            <span className="material-symbols-outlined text-base leading-none">
+              rectangle
+            </span>
+            <span className="text-xs font-bold tracking-tight">16:9</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() =>
+              setState((prev) => ({ ...prev, aspectRatio: "9:16" }))
+            }
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all duration-300 ${
+              state.aspectRatio === "9:16"
+                ? "bg-cyan-500/10 border-cyan-500/40 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
+                : "bg-white/2 border-white/5 text-slate-500 hover:bg-white/5"
+            }`}
+          >
+            <span className="material-symbols-outlined text-base leading-none rotate-90">
+              rectangle
+            </span>
+            <span className="text-xs font-bold tracking-tight">9:16</span>
+          </button>
+        </div>
+      </motion.div>
+
+      {/* Production Hints */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="grid grid-cols-1 sm:grid-cols-2 gap-2"
+      >
+        {/* Image Hints */}
+        <div className="flex flex-wrap gap-2">
+          <div className="flex items-center gap-2 text-[10px] text-slate-500 font-mono uppercase tracking-widest bg-white/2 px-2.5 py-1 rounded-md border border-white/5">
+            <span className="material-symbols-outlined text-[12px] text-cyan-500/70">
+              image
+            </span>
+            <span>IMG:</span>
+            <span className="text-slate-300">
+              {state.aspectRatio === "16:9" ? "1920x1080" : "1080x1920"}
+            </span>
+            <span className="w-1 h-1 bg-white/20 rounded-full" />
+            <span className="text-slate-400">MAX 1MB</span>
+          </div>
+        </div>
+
+        {/* Video Hints */}
+        <div className="flex flex-wrap gap-2">
+          <div className="flex items-center gap-2 text-[10px] text-slate-500 font-mono uppercase tracking-widest bg-white/2 px-2.5 py-1 rounded-md border border-white/5">
+            <span className="material-symbols-outlined text-[12px] text-violet-500/70">
+              movie
+            </span>
+            <span>VIDEO:</span>
+            <span className="text-slate-300">MP4 / H.264</span>
+            <span className="w-1 h-1 bg-white/20 rounded-full" />
+            <span className="text-slate-400">MAX 15MB</span>
+          </div>
+        </div>
+      </motion.div>
+
       {/* Upload cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-8">
         <motion.div
@@ -136,7 +229,7 @@ export default function ImageTrackingPage() {
             icon="image"
             title="Imagen de Seguimiento"
             formats="JPG, PNG, WEBP"
-            accept=".jpg,.jpeg,.png,.webp"
+            accept="image/*,.jpg,.jpeg,.png,.webp"
             onFileSelect={handleImageSelect}
             disabled={state.uploading}
           />
@@ -162,7 +255,7 @@ export default function ImageTrackingPage() {
             icon="movie"
             title="Video de Aumento"
             formats="MP4, MOV, WebM"
-            accept=".mp4,.mov,.webm"
+            accept="video/*,.mp4,.mov,.webm"
             onFileSelect={handleVideoSelect}
             disabled={state.uploading}
           />
@@ -313,7 +406,8 @@ export default function ImageTrackingPage() {
               <CompletedItem
                 key={project.id}
                 filename={project.title}
-                meta={`v1.0 • ${new Date(project.created_at).toLocaleDateString()}`}
+                thumbnailUrl={project.image_url}
+                meta={`${project.aspect_ratio} • ${project.is_public ? "🌐 Cloud" : "🔒 Private"} • ${new Date(project.created_at).toLocaleDateString()}`}
               />
             ))
           )}

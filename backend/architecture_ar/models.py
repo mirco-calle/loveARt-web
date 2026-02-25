@@ -1,25 +1,34 @@
 import os
-
+from io import BytesIO
+from PIL import Image
+from django.core.files import File
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import FileExtensionValidator
+from django.core.exceptions import ValidationError
 
+try:
+    from pdf2image import convert_from_bytes
+    PDF_SUPPORT = True
+except ImportError:
+    PDF_SUPPORT = False
 
 def blueprint_upload_path(instance, filename):
-    """Upload blueprints to: uploads/architecture/<user_id>/blueprints/<filename>"""
-    return os.path.join('architecture', str(instance.user.id), 'blueprints', filename)
+    """Upload blueprints to: architecture/<user_id>/blueprints/<filename>"""
+    base_name = os.path.splitext(filename)[0]
+    return os.path.join('architecture', str(instance.user.id), 'blueprints', f"{base_name}.webp")
 
 
 def model3d_upload_path(instance, filename):
-    """Upload 3D models to: uploads/architecture/<user_id>/models3d/<filename>"""
+    """Upload 3D models to: architecture/<user_id>/models3d/<filename>"""
     return os.path.join('architecture', str(instance.blueprint.user.id), 'models3d', filename)
 
 
 class Blueprint(models.Model):
     """
     Architectural blueprint/plan image.
-    This is the target image that the AR camera will detect (e.g. a floor plan photo).
-    When detected, Unity will overlay the associated 3D model on top of it.
+    If a PDF is uploaded, the first page is converted to WebP.
+    All images are resized and optimized for AR tracking.
     """
     user = models.ForeignKey(
         User,
@@ -33,7 +42,7 @@ class Blueprint(models.Model):
         validators=[
             FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'webp', 'pdf']),
         ],
-        help_text='Blueprint/plan file for AR tracking (JPG, PNG, WebP, PDF).',
+        help_text='Blueprint file (JPG, PNG, WebP, PDF). Se convertirá automáticamente a WebP.',
     )
     is_active = models.BooleanField(default=True)
     is_public = models.BooleanField(
@@ -42,6 +51,48 @@ class Blueprint(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        if self.image:
+            # Detectar si es un PDF
+            filename = self.image.name.lower()
+            
+            try:
+                if filename.endswith('.pdf'):
+                    if not PDF_SUPPORT:
+                        raise ValidationError("El servidor no tiene soporte para conversión de PDF.")
+                    
+                    # Leer bytes del PDF y convertir primera página
+                    pdf_bytes = self.image.read()
+                    images = convert_from_bytes(pdf_bytes, first_page=1, last_page=1)
+                    if not images:
+                        raise ValidationError("No se pudo extraer una imagen del PDF.")
+                    img = images[0]
+                else:
+                    # Es una imagen normal
+                    img = Image.open(self.image)
+                
+                # OPTIMIZACIÓN IGUAL QUE EN TRACKING IMAGE
+                if img.mode in ("RGBA", "P"):
+                    img = img.convert("RGB")
+                
+                max_size = 1280
+                if img.width > max_size or img.height > max_size:
+                    img.thumbnail((max_size, max_size), Image.LANCZOS)
+                
+                output = BytesIO()
+                img.save(output, format='WebP', quality=80, method=6)
+                output.seek(0)
+                
+                curr_name = os.path.splitext(self.image.name)[0]
+                self.image = File(output, name=f"{curr_name}.webp")
+                
+            except Exception as e:
+                # Si algo falla en la conversión, dejamos el archivo original
+                # pero es mejor loguearlo o lanzar error en desarrollo
+                print(f"Error procesando imagen/pdf: {e}")
+
+        super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = 'Blueprint'
@@ -53,12 +104,6 @@ class Blueprint(models.Model):
 
 
 class Model3D(models.Model):
-    """
-    3D model file associated with a Blueprint.
-    When the AR camera detects the Blueprint image, this 3D model
-    will be rendered on top of it in the Unity AR scene.
-    Supports FBX, OBJ, GLB, and GLTF formats.
-    """
     blueprint = models.OneToOneField(
         Blueprint,
         on_delete=models.CASCADE,
@@ -72,7 +117,6 @@ class Model3D(models.Model):
         ],
         help_text='3D model file (FBX, OBJ, GLB, GLTF).',
     )
-    # Optional: scale factor for Unity to apply when rendering
     scale = models.FloatField(
         default=1.0,
         help_text='Scale factor for the 3D model in AR scene.',

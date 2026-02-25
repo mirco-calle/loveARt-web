@@ -1,46 +1,102 @@
 import os
-
+from io import BytesIO
+from PIL import Image
+from django.core.files import File
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
+from django.core.files.images import get_image_dimensions
+
+# Constantes de optimización (Límites para un MVP Premium)
+MAX_IMAGE_SIZE_MB = 2 # Subimos a 2MB el límite de SUBIDA, pero el servidor lo bajará a <500KB
+MAX_VIDEO_SIZE_MB = 20
+
+def validate_image_size(value):
+    filesize = value.size
+    if filesize > MAX_IMAGE_SIZE_MB * 1024 * 1024:
+        raise ValidationError(f"La imagen original es muy pesada. Máximo permitido para subir: {MAX_IMAGE_SIZE_MB}MB")
+
+def validate_video_size(value):
+    filesize = value.size
+    if filesize > MAX_VIDEO_SIZE_MB * 1024 * 1024:
+        raise ValidationError(f"El video es muy pesado. Máximo permitido: {MAX_VIDEO_SIZE_MB}MB")
+
+def validate_aspect_ratio(instance, value):
+    width, height = get_image_dimensions(value)
+    if not width or not height:
+        return
+    
+    aspect_ratio = width / height
+    if instance.aspect_ratio == '16:9':
+        target = 16 / 9
+    else: 
+        target = 9 / 16
+        
+    tolerance = 0.2 
+    if not (target - tolerance <= aspect_ratio <= target + tolerance):
+        raise ValidationError(f"La imagen no coincide con el formato {instance.aspect_ratio} seleccionado.")
 
 
 def tracking_image_upload_path(instance, filename):
-    """Upload images to: uploads/tracking/<user_id>/images/<filename>"""
-    return os.path.join('tracking', str(instance.user.id), 'images', filename)
+    # Forzamos la extensión .webp en la ruta final
+    base_name = os.path.splitext(filename)[0]
+    return os.path.join('tracking', str(instance.user.id), 'images', f"{base_name}.webp")
 
 
 def tracking_video_upload_path(instance, filename):
-    """Upload videos to: uploads/tracking/<user_id>/videos/<filename>"""
     return os.path.join('tracking', str(instance.user.id), 'videos', filename)
 
 
 class TrackingImage(models.Model):
-    """
-    Target image that will be recognized by the AR camera.
-    This is the image that Vuforia/AR Foundation will detect in the real world.
-    """
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='tracking_images',
-    )
+    ASPECT_RATIO_CHOICES = [
+        ('16:9', 'Horizontal (16:9)'),
+        ('9:16', 'Vertical (9:16)'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tracking_images')
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, default='')
+    aspect_ratio = models.CharField(max_length=10, choices=ASPECT_RATIO_CHOICES, default='16:9')
     image = models.ImageField(
         upload_to=tracking_image_upload_path,
-        validators=[
-            FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'webp']),
-        ],
-        help_text='Target image for AR tracking (JPG, PNG, WebP).',
+        validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'webp']), validate_image_size],
+        help_text='Target image for AR tracking. Se convertirá automáticamente a WebP.'
     )
     is_active = models.BooleanField(default=True)
-    is_public = models.BooleanField(
-        default=False,
-        help_text='If True, this content will be visible to ALL users (e.g. for ads or public art).',
-    )
+    is_public = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def clean(self):
+        super().clean()
+        if self.image:
+            validate_aspect_ratio(self, self.image)
+
+    def save(self, *args, **kwargs):
+        # OPTIMIZACIÓN DE IMAGEN ANTES DE SUBIR A S3
+        if self.image:
+            img = Image.open(self.image)
+            
+            # 1. Convertir a RGB (necesario para JPEG/WebP si viene de PNG con transparencia)
+            if img.mode in ("RGBA", "P"):
+                img = img.convert("RGB")
+            
+            # 2. Redimensionar si es muy grande (máximo 1280px de ancho/alto para eficiencia AR)
+            max_size = 1280
+            if img.width > max_size or img.height > max_size:
+                img.thumbnail((max_size, max_size), Image.LANCZOS)
+            
+            # 3. Guardar en un buffer como WebP
+            output = BytesIO()
+            img.save(output, format='WebP', quality=80, method=6) # method 6 es compresión lenta pero mejor
+            output.seek(0)
+            
+            # 4. Cambiar el archivo original por el optimizado
+            curr_name = os.path.splitext(self.image.name)[0]
+            self.image = File(output, name=f"{curr_name}.webp")
+
+        super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = 'Tracking Image'
@@ -48,33 +104,22 @@ class TrackingImage(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        return f"[{self.user.username}] {self.title}"
+        return f"[{self.user.username}] {self.title} ({self.aspect_ratio})"
 
 
 class TrackingVideo(models.Model):
-    """
-    Video content associated with a TrackingImage.
-    When the AR camera detects the TrackingImage, this video will be displayed.
-    """
-    tracking_image = models.OneToOneField(
-        TrackingImage,
-        on_delete=models.CASCADE,
-        related_name='video',
-    )
+    tracking_image = models.OneToOneField(TrackingImage, on_delete=models.CASCADE, related_name='video')
     title = models.CharField(max_length=255)
     video = models.FileField(
         upload_to=tracking_video_upload_path,
-        validators=[
-            FileExtensionValidator(allowed_extensions=['mp4', 'webm', 'mov', 'avi']),
-        ],
-        help_text='Video file to display in AR (MP4, WebM, MOV, AVI).',
+        validators=[FileExtensionValidator(allowed_extensions=['mp4', 'webm', 'mov', 'avi']), validate_video_size],
+        help_text='Video file to display in AR.'
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     @property
     def user(self):
-        """Helper to access user from tracking_image for upload path."""
         return self.tracking_image.user
 
     class Meta:

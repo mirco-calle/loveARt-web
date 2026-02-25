@@ -111,7 +111,7 @@ export default function ArchitecturePage() {
           icon="description"
           title="Plano Técnico"
           formats="JPG, PNG, WebP, PDF"
-          accept=".jpg,.jpeg,.png,.webp,.pdf"
+          accept="image/*,.jpg,.jpeg,.png,.webp,.pdf"
           onFileSelect={handleBlueprintSelect}
           disabled={state.uploading}
         />

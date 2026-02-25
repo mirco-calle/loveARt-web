@@ -171,7 +171,8 @@ export default function MyLibraryPage() {
               filename={
                 (item as TrackingImage).title || (item as Blueprint).title
               }
-              meta={`${item.is_public ? "🌐 Cloud Public" : "🔒 Local Private"} • ${new Date(item.created_at).toLocaleDateString()}`}
+              thumbnailUrl={(item as TrackingImage).image_url}
+              meta={`${item.is_public ? "🌐 Cloud Public" : "🔒 Cloud Private"} • ${new Date(item.created_at).toLocaleDateString()}`}
               icon={tab === "tracking" ? "image" : "deployed_code"}
               onOptions={() => {}}
             />

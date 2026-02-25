@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
     'drf_spectacular',
+    'storages',
     # Apps del proyecto
     'image_tracking',
     'architecture_ar',
@@ -234,5 +235,46 @@ GMAIL_CLIENT_SECRET = os.environ.get('GOOGLE_OAUTH_CLIENT_SECRET', '')
 GMAIL_REFRESH_TOKEN = os.environ.get('GMAIL_REFRESH_TOKEN', '')
 
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'LoveArt <noreply@loveart.app>')
+
+# ============================================
+# AWS S3 & CLOUDFRONT CONFIGURATION
+# ============================================
+AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
+AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME', 'us-east-1')
+
+# Dominio de CloudFront (ejemplo: d111111abcdef8.cloudfront.net)
+AWS_S3_CUSTOM_DOMAIN = os.environ.get('AWS_S3_CUSTOM_DOMAIN')
+
+if all([AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_STORAGE_BUCKET_NAME]):
+    DEFAULT_FILE_STORAGE = 'loveart.storages_backends.MediaStorage'
+    STATICFILES_STORAGE = 'loveart.storages_backends.StaticStorage'
+    
+    AWS_S3_OBJECT_PARAMETERS = {
+        'CacheControl': 'max-age=86400',
+    }
+    
+    # SigV4 is required for some regions
+    AWS_S3_SIGNATURE_VERSION = 's3v4'
+    
+    # Descomenta esto si quieres que las URLs NO tengan firma (contenido totalmente público)
+    # AWS_QUERYSTRING_AUTH = False
+    
+    # URL configurations
+    if AWS_S3_CUSTOM_DOMAIN:
+        # Si hay CloudFront, usamos ese dominio
+        STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
+        MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/uploads/'
+    else:
+        # Si no, usamos el dominio de S3 directamente
+        STATIC_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/static/'
+        MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/uploads/'
+
+    print(f"✅ Storage: Usando AWS S3 (Bucket: {AWS_STORAGE_BUCKET_NAME})")
+    if AWS_S3_CUSTOM_DOMAIN:
+        print(f"✅ CloudFront: Habilitado (Dominio: {AWS_S3_CUSTOM_DOMAIN})")
+else:
+    print("ℹ️ Storage: Usando almacenamiento local (Faltan variables AWS en .env)")
 
 

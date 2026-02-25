@@ -9,6 +9,7 @@ export interface TrackingImage {
   title: string;
   description: string;
   image_url: string;
+  aspect_ratio: "16:9" | "9:16";
   is_active: boolean;
   is_public: boolean;
   video: TrackingVideo | null;
