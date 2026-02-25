@@ -9,7 +9,7 @@ class TrackingVideoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TrackingVideo
-        fields = ['id', 'title', 'video', 'video_url', 'created_at', 'updated_at']
+        fields = ['id', 'title', 'video', 'video_url', 'file_size', 'created_at', 'updated_at']
         read_only_fields = ['id', 'created_at', 'updated_at']
 
     def get_video_url(self, obj):
@@ -33,8 +33,9 @@ class TrackingImageSerializer(serializers.ModelSerializer):
         model = TrackingImage
         fields = [
             'id', 'user', 'title', 'description',
-            'aspect_ratio', 'image', 'image_url', 'is_active',
-            'video', 'created_at', 'updated_at',
+            'aspect_ratio', 'image', 'image_url', 
+            'file_size', 'width', 'height',
+            'is_active', 'video', 'created_at', 'updated_at',
         ]
         read_only_fields = ['id', 'user', 'created_at', 'updated_at']
 

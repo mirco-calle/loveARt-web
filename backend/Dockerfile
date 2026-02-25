@@ -65,7 +65,7 @@ exec gunicorn --bind 0.0.0.0:${PORT:-8000} \\\n\
     --access-logfile - \\\n\
     --error-logfile - \\\n\
     --log-level info \\\n\
-    icard.wsgi:application\n\
+    loveart.wsgi:application\n\
 ' > /app/entrypoint.sh && chmod +x /app/entrypoint.sh
 
 # Expose port

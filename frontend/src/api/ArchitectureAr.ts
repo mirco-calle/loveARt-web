@@ -9,6 +9,10 @@ export interface Blueprint {
   title: string;
   description: string;
   image_url: string;
+  file_size?: number;
+  width?: number;
+  height?: number;
+  original_format?: string;
   is_active: boolean;
   is_public: boolean;
   model3d: Model3D | null;
@@ -20,6 +24,7 @@ export interface Model3D {
   title: string;
   file_url: string;
   scale: number;
+  file_size?: number;
 }
 
 /** List all blueprints for the authenticated user */

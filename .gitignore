@@ -53,3 +53,5 @@ Thumbs.db
 coverage/
 **/coverage/
 *.lcov
+#info
+DEPLOY_STRATEGY.md

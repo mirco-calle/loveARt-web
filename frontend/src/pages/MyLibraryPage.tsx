@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import GlassCard from "../components/ui/GlassCard";
-import CompletedItem from "../components/ui/CompletedItem";
+import AssetLibraryItem from "../components/ui/AssetLibraryItem";
 import { getTrackingImages } from "../api/ImageTracking";
 import { getBlueprints } from "../api/ArchitectureAr";
 import type { TrackingImage } from "../api/ImageTracking";
@@ -23,8 +23,16 @@ export default function MyLibraryPage() {
           getTrackingImages(),
           getBlueprints(),
         ]);
-        setTrackingImages(trackingRes.data.results || []);
-        setBlueprints(archRes.data.results || []);
+        // Handle both direct arrays and wrapped {results: []} responses
+        const tData = Array.isArray(trackingRes.data)
+          ? trackingRes.data
+          : trackingRes.data.results;
+        const aData = Array.isArray(archRes.data)
+          ? archRes.data
+          : archRes.data.results;
+
+        setTrackingImages(tData || []);
+        setBlueprints(aData || []);
       } catch {
         // Handled by axios interceptor
       } finally {
@@ -164,19 +172,46 @@ export default function MyLibraryPage() {
           </p>
         </motion.div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 lg:gap-4">
-          {items.map((item) => (
-            <CompletedItem
-              key={item.id}
-              filename={
-                (item as TrackingImage).title || (item as Blueprint).title
-              }
-              thumbnailUrl={(item as TrackingImage).image_url}
-              meta={`${item.is_public ? "🌐 Cloud Public" : "🔒 Cloud Private"} • ${new Date(item.created_at).toLocaleDateString()}`}
-              icon={tab === "tracking" ? "image" : "deployed_code"}
-              onOptions={() => {}}
-            />
-          ))}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {items.map((item) => {
+            if (tab === "tracking") {
+              const ti = item as TrackingImage;
+              return (
+                <AssetLibraryItem
+                  key={ti.id}
+                  type="tracking"
+                  title={ti.title}
+                  thumbnailUrl={ti.image_url}
+                  aspectRatio={ti.aspect_ratio}
+                  fileSize={ti.file_size}
+                  width={ti.width}
+                  height={ti.height}
+                  createdAt={ti.created_at}
+                  isPublic={ti.is_public}
+                  videoSize={ti.video?.file_size}
+                  onOptions={() => {}}
+                />
+              );
+            } else {
+              const bp = item as Blueprint;
+              return (
+                <AssetLibraryItem
+                  key={bp.id}
+                  type="architecture"
+                  title={bp.title}
+                  thumbnailUrl={bp.image_url}
+                  fileSize={bp.file_size}
+                  width={bp.width}
+                  height={bp.height}
+                  originalFormat={bp.original_format}
+                  createdAt={bp.created_at}
+                  isPublic={bp.is_public}
+                  model3dSize={bp.model3d?.file_size}
+                  onOptions={() => {}}
+                />
+              );
+            }
+          })}
         </div>
       )}
     </div>

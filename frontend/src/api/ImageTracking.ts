@@ -10,6 +10,9 @@ export interface TrackingImage {
   description: string;
   image_url: string;
   aspect_ratio: "16:9" | "9:16";
+  file_size?: number;
+  width?: number;
+  height?: number;
   is_active: boolean;
   is_public: boolean;
   video: TrackingVideo | null;
@@ -20,6 +23,7 @@ export interface TrackingVideo {
   id: number;
   title: string;
   video_url: string;
+  file_size?: number;
 }
 
 /** List all tracking images for the authenticated user */

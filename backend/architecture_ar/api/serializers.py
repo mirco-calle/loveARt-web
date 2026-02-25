@@ -9,7 +9,7 @@ class Model3DSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Model3D
-        fields = ['id', 'title', 'file', 'file_url', 'scale', 'created_at', 'updated_at']
+        fields = ['id', 'title', 'file', 'file_url', 'scale', 'file_size', 'created_at', 'updated_at']
         read_only_fields = ['id', 'created_at', 'updated_at']
 
     def get_file_url(self, obj):
@@ -33,8 +33,9 @@ class BlueprintSerializer(serializers.ModelSerializer):
         model = Blueprint
         fields = [
             'id', 'user', 'title', 'description',
-            'image', 'image_url', 'is_active',
-            'model3d', 'created_at', 'updated_at',
+            'image', 'image_url', 
+            'file_size', 'width', 'height', 'original_format',
+            'is_active', 'model3d', 'created_at', 'updated_at',
         ]
         read_only_fields = ['id', 'user', 'created_at', 'updated_at']
 
