@@ -42,13 +42,19 @@ export default function RegisterForm({
 
     setIsLoading(true);
     try {
-      // Derive username from email (backend requirement)
-      const username = form.email.split("@")[0];
+      // Derive a unique-ish username from name or email
+      const sanitizedName = form.full_name
+        .trim()
+        .replace(/\s+/g, ".")
+        .toLowerCase();
+      const username = sanitizedName || form.email.split("@")[0];
+
       await registerUser({
         username,
         email: form.email,
         password: form.password,
         password_confirm: form.password_confirm,
+        first_name: form.full_name,
       });
       toast.success("¡Cuenta creada! Verifica tu email.");
       // Move to OTP verification passing the registered email

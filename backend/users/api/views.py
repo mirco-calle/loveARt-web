@@ -343,7 +343,7 @@ def google_login_view(request):
         email=email,
         defaults={
             'username': email.split('@')[0],
-            'first_name': google_data.get('given_name', ''),
+            'first_name': google_data.get('given_name', google_data.get('name', '')),
             'last_name': google_data.get('family_name', ''),
             'is_active': True,
         },

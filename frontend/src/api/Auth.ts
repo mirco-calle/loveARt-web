@@ -29,6 +29,7 @@ export const registerUser = (data: {
   email: string;
   password: string;
   password_confirm: string;
+  first_name?: string;
 }) => api.post<AuthResponse>("/users/register/", data);
 
 /** Login with username OR email + password */
