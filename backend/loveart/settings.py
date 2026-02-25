@@ -146,16 +146,20 @@ WSGI_APPLICATION = 'loveart.wsgi.application'
 DATABASE_URL = os.environ.get('DATABASE_URL')
 
 if DATABASE_URL:
-    # Producción: Railway inyecta DATABASE_URL automáticamente
-    db_config = dj_database_url.config(
-        default=DATABASE_URL,
-        conn_max_age=600,
-        conn_health_checks=True,
-        ssl_require=True,
-    )
-    db_config['OPTIONS'] = {'options': '-c search_path=public'}
-    DATABASES = {'default': db_config}
-    print("✅ Base de datos: Usando DATABASE_URL (Railway/Producción)")
+    # Parsing de la URL de forma robusta
+    DATABASES = {
+        'default': dj_database_url.parse(DATABASE_URL)
+    }
+    
+    # Si es el pooler (6543), CONN_MAX_AGE debe ser 0. Si es directo (5432), usamos 600.
+    DATABASES['default']['CONN_MAX_AGE'] = 0 if ':6543' in DATABASE_URL else 600
+    
+    # Forzar SSL para Supabase (indispensable)
+    if 'supabase' in DATABASE_URL:
+        DATABASES['default'].setdefault('OPTIONS', {})
+        DATABASES['default']['OPTIONS']['sslmode'] = 'require'
+    
+    print(f"✅ Base de datos: Usando {'Pooler' if ':6543' in DATABASE_URL else 'Directa'} (Supabase)")
 else:
     # Desarrollo local: Docker Compose
     DATABASES = {
