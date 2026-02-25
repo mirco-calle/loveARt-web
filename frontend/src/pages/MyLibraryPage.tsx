@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { toast } from "react-toastify";
 import GlassCard from "../components/ui/GlassCard";
 import AssetLibraryItem from "../components/ui/AssetLibraryItem";
-import { getTrackingImages } from "../api/ImageTracking";
-import { getBlueprints } from "../api/ArchitectureAr";
+import ModalConfirm from "../components/common/ModalConfirm";
+import { getTrackingImages, deleteTrackingImage } from "../api/ImageTracking";
+import { getBlueprints, deleteBlueprint } from "../api/ArchitectureAr";
 import type { TrackingImage } from "../api/ImageTracking";
 import type { Blueprint } from "../api/ArchitectureAr";
 
@@ -15,32 +17,64 @@ export default function MyLibraryPage() {
   const [blueprints, setBlueprints] = useState<Blueprint[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const load = async () => {
-      setLoading(true);
-      try {
-        const [trackingRes, archRes] = await Promise.all([
-          getTrackingImages(),
-          getBlueprints(),
-        ]);
-        // Handle both direct arrays and wrapped {results: []} responses
-        const tData = Array.isArray(trackingRes.data)
-          ? trackingRes.data
-          : trackingRes.data.results;
-        const aData = Array.isArray(archRes.data)
-          ? archRes.data
-          : archRes.data.results;
+  // States for deletion modal
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<{
+    id: number;
+    title: string;
+    type: Tab;
+  } | null>(null);
 
-        setTrackingImages(tData || []);
-        setBlueprints(aData || []);
-      } catch {
-        // Handled by axios interceptor
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const [trackingRes, archRes] = await Promise.all([
+        getTrackingImages(),
+        getBlueprints(),
+      ]);
+      const tData = Array.isArray(trackingRes.data)
+        ? trackingRes.data
+        : trackingRes.data.results;
+      const aData = Array.isArray(archRes.data)
+        ? archRes.data
+        : archRes.data.results;
+
+      setTrackingImages(tData || []);
+      setBlueprints(aData || []);
+    } catch {
+      // Handled by axios interceptor
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
   }, []);
+
+  const confirmDelete = async () => {
+    if (!itemToDelete) return;
+
+    try {
+      setIsDeleting(true);
+      if (itemToDelete.type === "tracking") {
+        await deleteTrackingImage(itemToDelete.id);
+        setTrackingImages((prev) =>
+          prev.filter((i) => i.id !== itemToDelete.id),
+        );
+      } else {
+        await deleteBlueprint(itemToDelete.id);
+        setBlueprints((prev) => prev.filter((i) => i.id !== itemToDelete.id));
+      }
+      toast.success("Proyecto eliminado correctamente");
+    } catch (error) {
+      toast.error("Error al eliminar el proyecto");
+      console.error(error);
+    } finally {
+      setIsDeleting(false);
+      setItemToDelete(null);
+    }
+  };
 
   const items = tab === "tracking" ? trackingImages : blueprints;
 
@@ -61,6 +95,7 @@ export default function MyLibraryPage() {
       </motion.div>
 
       {/* Tabs Control */}
+      {/* ... (Keep same tabs control) */}
       <div className="flex flex-col sm:flex-row gap-4 sm:items-center justify-between border-b border-white/5 pb-4">
         <div className="flex p-1 bg-white/5 rounded-2xl w-fit">
           <button
@@ -98,6 +133,7 @@ export default function MyLibraryPage() {
       </div>
 
       {/* Stats Dashboard */}
+      {/* ... (Keep same stats dashboard) */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <GlassCard className="p-5 flex flex-col justify-between border-white/10 hover:border-primary/30 transition-colors">
           <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
@@ -189,7 +225,13 @@ export default function MyLibraryPage() {
                   createdAt={ti.created_at}
                   isPublic={ti.is_public}
                   videoSize={ti.video?.file_size}
-                  onOptions={() => {}}
+                  onDelete={() =>
+                    setItemToDelete({
+                      id: ti.id,
+                      title: ti.title,
+                      type: "tracking",
+                    })
+                  }
                 />
               );
             } else {
@@ -207,13 +249,32 @@ export default function MyLibraryPage() {
                   createdAt={bp.created_at}
                   isPublic={bp.is_public}
                   model3dSize={bp.model3d?.file_size}
-                  onOptions={() => {}}
+                  onDelete={() =>
+                    setItemToDelete({
+                      id: bp.id,
+                      title: bp.title,
+                      type: "architecture",
+                    })
+                  }
                 />
               );
             }
           })}
         </div>
       )}
+
+      {/* Popups & Modals */}
+      <ModalConfirm
+        isOpen={!!itemToDelete}
+        onCancel={() => setItemToDelete(null)}
+        onConfirm={confirmDelete}
+        title="¿Eliminar Proyecto?"
+        description={`Estás a punto de eliminar "${itemToDelete?.title}". Esta acción borrará también los archivos de video/3D asociados de la nube y no se puede deshacer.`}
+        confirmLabel="Eliminar para siempre"
+        isLoading={isDeleting}
+        variant="danger"
+        icon="delete_forever"
+      />
     </div>
   );
 }

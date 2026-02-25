@@ -176,7 +176,13 @@ function RecentItem({
 export default function Home() {
   const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
-  const displayName = user?.first_name || user?.username || "Creator";
+  const displayName =
+    user?.first_name?.trim() ||
+    (user?.username
+      ? user.username.split(".")[0].charAt(0).toUpperCase() +
+        user.username.split(".")[0].slice(1)
+      : "") ||
+    "Creator";
 
   return (
     <div className="px-5 py-8 md:px-10 md:py-12 lg:px-12 max-w-7xl mx-auto overflow-x-hidden">

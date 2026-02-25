@@ -349,6 +349,18 @@ def google_login_view(request):
         },
     )
 
+    if not created:
+        # Update name if empty (for users created before this fix)
+        updated = False
+        if not user.first_name:
+            user.first_name = google_data.get('given_name', google_data.get('name', ''))
+            updated = True
+        if not user.last_name:
+            user.last_name = google_data.get('family_name', '')
+            updated = True
+        if updated:
+            user.save()
+
     if created:
         UserProfile.objects.get_or_create(user=user)
 

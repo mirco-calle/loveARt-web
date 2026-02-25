@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'drf_spectacular',
     'storages',
+    'django_cleanup.apps.CleanupConfig',
     # Apps del proyecto
     'image_tracking',
     'architecture_ar',
@@ -257,8 +258,14 @@ AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME', 'us-east-1')
 AWS_S3_CUSTOM_DOMAIN = os.environ.get('AWS_S3_CUSTOM_DOMAIN')
 
 if all([AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_STORAGE_BUCKET_NAME]):
-    DEFAULT_FILE_STORAGE = 'loveart.storages_backends.MediaStorage'
-    STATICFILES_STORAGE = 'loveart.storages_backends.StaticStorage'
+    STORAGES = {
+        "default": {
+            "BACKEND": "loveart.storages_backends.MediaStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "loveart.storages_backends.StaticStorage",
+        },
+    }
     
     AWS_S3_OBJECT_PARAMETERS = {
         'CacheControl': 'max-age=86400',

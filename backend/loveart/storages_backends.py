@@ -1,3 +1,4 @@
+from django.conf import settings
 from storages.backends.s3boto3 import S3Boto3Storage
 
 class MediaStorage(S3Boto3Storage):
@@ -8,6 +9,8 @@ class MediaStorage(S3Boto3Storage):
     location = 'uploads'
     file_overwrite = False
     default_acl = None
+    # Use CloudFront domain if available for generated URLs
+    custom_domain = settings.AWS_S3_CUSTOM_DOMAIN if hasattr(settings, 'AWS_S3_CUSTOM_DOMAIN') else None
 
 class StaticStorage(S3Boto3Storage):
     """
@@ -16,3 +19,5 @@ class StaticStorage(S3Boto3Storage):
     """
     location = 'static'
     default_acl = None
+    # Use CloudFront domain if available for generated URLs
+    custom_domain = settings.AWS_S3_CUSTOM_DOMAIN if hasattr(settings, 'AWS_S3_CUSTOM_DOMAIN') else None

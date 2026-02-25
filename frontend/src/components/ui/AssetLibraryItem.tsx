@@ -15,6 +15,7 @@ interface AssetLibraryItemProps {
   videoSize?: number;
   model3dSize?: number;
   onOptions?: () => void;
+  onDelete?: () => void;
 }
 
 export default function AssetLibraryItem({
@@ -31,6 +32,7 @@ export default function AssetLibraryItem({
   videoSize,
   model3dSize,
   onOptions,
+  onDelete,
 }: AssetLibraryItemProps) {
   return (
     <motion.div
@@ -68,7 +70,7 @@ export default function AssetLibraryItem({
             <h4 className="text-sm font-bold text-white truncate tracking-tight">
               {title}
             </h4>
-            <div className="flex items-center gap-1.5 shrink-0">
+            <div className="flex items-center gap-2 shrink-0">
               <span
                 className={`text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded-md border ${
                   isPublic
@@ -78,6 +80,38 @@ export default function AssetLibraryItem({
               >
                 {isPublic ? "Public" : "Private"}
               </span>
+
+              {/* Action Buttons inside the header flow */}
+              <div className="flex items-center gap-1 ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                {onOptions && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onOptions();
+                    }}
+                    className="p-1 px-1.5 rounded-lg bg-white/5 border border-white/5 text-slate-400 hover:text-white hover:border-white/10 transition-all"
+                    title="Ajustes"
+                  >
+                    <span className="material-symbols-outlined text-[16px]">
+                      settings
+                    </span>
+                  </button>
+                )}
+                {onDelete && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDelete();
+                    }}
+                    className="p-1 px-1.5 rounded-lg bg-red-500/5 border border-red-500/10 text-red-500/60 hover:text-red-500 hover:border-red-500/30 transition-all"
+                    title="Eliminar"
+                  >
+                    <span className="material-symbols-outlined text-[16px]">
+                      delete
+                    </span>
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 
@@ -130,15 +164,6 @@ export default function AssetLibraryItem({
           )}
         </div>
       </div>
-
-      {onOptions && (
-        <button
-          onClick={onOptions}
-          className="absolute top-4 right-4 text-slate-600 hover:text-white transition-colors bg-white/5 p-1 rounded-lg opacity-0 group-hover:opacity-100 duration-300"
-        >
-          <span className="material-symbols-outlined text-lg">settings</span>
-        </button>
-      )}
     </motion.div>
   );
 }
