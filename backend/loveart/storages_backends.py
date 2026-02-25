@@ -7,7 +7,7 @@ class MediaStorage(S3Boto3Storage):
     """
     location = 'uploads'
     file_overwrite = False
-    # If AWS_S3_CUSTOM_DOMAIN is set in settings, it will be used for URLs.
+    default_acl = None
 
 class StaticStorage(S3Boto3Storage):
     """
@@ -15,4 +15,4 @@ class StaticStorage(S3Boto3Storage):
     Uploads will go to the 'static/' directory in the S3 bucket.
     """
     location = 'static'
-    default_acl = 'public-read'
+    default_acl = None
