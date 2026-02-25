@@ -267,8 +267,9 @@ if all([AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_STORAGE_BUCKET_NAME]):
     # SigV4 is required for some regions
     AWS_S3_SIGNATURE_VERSION = 's3v4'
     
-    # Descomenta esto si quieres que las URLs NO tengan firma (contenido totalmente público)
-    # AWS_QUERYSTRING_AUTH = False
+    # Desactivar ACLs (necesario para buckets nuevos de AWS que no permiten ACLs)
+    AWS_DEFAULT_ACL = None
+    AWS_QUERYSTRING_AUTH = False
     
     # URL configurations
     if AWS_S3_CUSTOM_DOMAIN:
