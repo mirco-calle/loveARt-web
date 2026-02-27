@@ -15,7 +15,7 @@ except ImportError:
 
 def blueprint_upload_path(instance, filename):
     base_name = os.path.splitext(filename)[0]
-    return os.path.join('architecture', str(instance.user.id), 'blueprints', f"{base_name}.webp")
+    return os.path.join('architecture', str(instance.user.id), 'blueprints', f"{base_name}.jpg")
 
 
 def model3d_upload_path(instance, filename):
@@ -35,7 +35,7 @@ class Blueprint(models.Model):
         validators=[
             FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'webp', 'pdf']),
         ],
-        help_text='Blueprint file (JPG, PNG, WebP, PDF). Se convertirá automáticamente a WebP.',
+        help_text='Blueprint file (JPG, PNG, WebP, PDF). Se convertirá automáticamente a JPG optimizado.',
     )
     
     # --- Technical Metadata ---
@@ -75,7 +75,7 @@ class Blueprint(models.Model):
                     img.thumbnail((max_size, max_size), Image.LANCZOS)
                 
                 output = BytesIO()
-                img.save(output, format='WebP', quality=80, method=6)
+                img.save(output, format='JPEG', quality=80, optimize=True)
                 
                 # Metadata
                 self.width = img.width
@@ -84,7 +84,7 @@ class Blueprint(models.Model):
                 
                 output.seek(0)
                 curr_name = os.path.splitext(self.image.name)[0]
-                self.image = File(output, name=f"{curr_name}.webp")
+                self.image = File(output, name=f"{curr_name}.jpg")
             except Exception as e:
                 print(f"Error procesando imagen/pdf: {e}")
 

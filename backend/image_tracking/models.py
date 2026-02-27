@@ -40,7 +40,7 @@ def validate_aspect_ratio(instance, value):
 
 def tracking_image_upload_path(instance, filename):
     base_name = os.path.splitext(filename)[0]
-    return os.path.join('tracking', str(instance.user.id), 'images', f"{base_name}.webp")
+    return os.path.join('tracking', str(instance.user.id), 'images', f"{base_name}.jpg")
 
 
 def tracking_video_upload_path(instance, filename):
@@ -60,7 +60,7 @@ class TrackingImage(models.Model):
     image = models.ImageField(
         upload_to=tracking_image_upload_path,
         validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'webp']), validate_image_size],
-        help_text='Target image for AR tracking. Se convertirá automáticamente a WebP.'
+        help_text='Target image for AR tracking. Se convertirá automáticamente a JPG optimizado.'
     )
     
     # --- Technical Metadata ---
@@ -90,7 +90,7 @@ class TrackingImage(models.Model):
                 img.thumbnail((max_size, max_size), Image.LANCZOS)
             
             output = BytesIO()
-            img.save(output, format='WebP', quality=80, method=6)
+            img.save(output, format='JPEG', quality=80, optimize=True)
             
             # Guardamos metadata técnica
             self.width = img.width
@@ -99,7 +99,7 @@ class TrackingImage(models.Model):
             
             output.seek(0)
             curr_name = os.path.splitext(self.image.name)[0]
-            self.image = File(output, name=f"{curr_name}.webp")
+            self.image = File(output, name=f"{curr_name}.jpg")
 
         super().save(*args, **kwargs)
 
