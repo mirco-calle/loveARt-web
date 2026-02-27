@@ -170,7 +170,7 @@ def unity_tracking_data(request):
     """
     images = (
         TrackingImage.objects
-        .filter(user=request.user, is_active=True)
+        .filter(user=request.user)
         .select_related('video')
     )
     serializer = TrackingDataForUnitySerializer(
@@ -192,7 +192,7 @@ def unity_tracking_catalog(request):
     """
     images = (
         TrackingImage.objects
-        .filter(is_public=True, is_active=True)
+        .filter(is_public=True)
         .select_related('video')
     )
     serializer = TrackingDataForUnitySerializer(

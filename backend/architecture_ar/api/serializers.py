@@ -35,7 +35,7 @@ class BlueprintSerializer(serializers.ModelSerializer):
             'id', 'user', 'title', 'description',
             'image', 'image_url', 
             'file_size', 'width', 'height', 'original_format',
-            'is_active', 'model3d', 'created_at', 'updated_at',
+            'model3d', 'created_at', 'updated_at',
         ]
         read_only_fields = ['id', 'user', 'created_at', 'updated_at']
 
@@ -52,7 +52,7 @@ class BlueprintCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Blueprint
-        fields = ['id', 'title', 'description', 'image', 'is_active']
+        fields = ['id', 'title', 'description', 'image']
         read_only_fields = ['id']
 
 

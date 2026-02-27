@@ -168,7 +168,7 @@ def unity_architecture_data(request):
     """
     blueprints = (
         Blueprint.objects
-        .filter(user=request.user, is_active=True)
+        .filter(user=request.user)
         .select_related('model3d')
     )
     serializer = ArchitectureDataForUnitySerializer(
@@ -190,7 +190,7 @@ def unity_architecture_catalog(request):
     """
     blueprints = (
         Blueprint.objects
-        .filter(is_public=True, is_active=True)
+        .filter(is_public=True)
         .select_related('model3d')
     )
     serializer = ArchitectureDataForUnitySerializer(
