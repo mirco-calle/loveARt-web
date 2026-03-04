@@ -9,8 +9,8 @@ class Model3DSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Model3D
-        fields = ['id', 'title', 'file', 'file_url', 'scale', 'file_size', 'created_at', 'updated_at']
-        read_only_fields = ['id', 'created_at', 'updated_at']
+        fields = ['id', 'title', 'file', 'file_url', 'scale', 'file_size', 'original_format', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'original_format', 'created_at', 'updated_at']
 
     def get_file_url(self, obj):
         """Return absolute URL for Unity to download the 3D model."""

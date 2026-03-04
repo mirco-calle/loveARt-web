@@ -1,11 +1,23 @@
 import os
+import logging
 from io import BytesIO
+from pathlib import Path
+
 from PIL import Image
 from django.core.files import File
+from django.core.files.base import ContentFile
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import FileExtensionValidator
 from django.core.exceptions import ValidationError
+
+from architecture_ar.utils import (
+    convert_to_glb,
+    FORMATS_REQUIRING_CONVERSION,
+    ALLOWED_3D_EXTENSIONS,
+)
+
+logger = logging.getLogger(__name__)
 
 try:
     from pdf2image import convert_from_bytes
@@ -109,14 +121,21 @@ class Model3D(models.Model):
     file = models.FileField(
         upload_to=model3d_upload_path,
         validators=[
-            FileExtensionValidator(allowed_extensions=['fbx', 'obj', 'glb', 'gltf']),
+            FileExtensionValidator(allowed_extensions=ALLOWED_3D_EXTENSIONS),
         ],
-        help_text='3D model file (FBX, OBJ, GLB, GLTF).',
+        help_text=(
+            f'3D model file. Upload FBX or OBJ and we convert it automatically to GLB. '
+            f'Accepted formats: {", ".join(f.lstrip(".").upper() for f in ALLOWED_3D_EXTENSIONS)}.'
+        ),
     )
-    
+
     # --- Technical Metadata ---
     file_size = models.PositiveIntegerField(null=True, blank=True)
-    
+    original_format = models.CharField(
+        max_length=10, blank=True, null=True,
+        help_text='Original upload format (FBX, OBJ, etc.) before conversion.',
+    )
+
     scale = models.FloatField(
         default=1.0,
         help_text='Scale factor for the 3D model in AR scene.',
@@ -125,8 +144,43 @@ class Model3D(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def save(self, *args, **kwargs):
+        """Auto-convert FBX/OBJ uploads to GLB before persisting.
+
+        Follows the same pattern as Blueprint.save() (PDF→JPG):
+        the original file is transparently replaced by the converted one
+        so callers and Unity always receive a .glb file.
+        """
         if self.file:
-            self.file_size = self.file.size
+            ext = Path(self.file.name).suffix.lower()
+            self.original_format = ext.lstrip('.').upper()
+
+            if ext in FORMATS_REQUIRING_CONVERSION:
+                try:
+                    # Read all bytes before the file pointer moves
+                    raw_bytes = self.file.read()
+                    glb_bytes = convert_to_glb(raw_bytes, self.file.name)
+
+                    stem = Path(self.file.name).stem
+                    glb_filename = f"{stem}.glb"
+
+                    # Replace the in-memory file object with the converted one.
+                    # ContentFile is an in-memory file that Django's storage
+                    # backends (local disk & S3) handle transparently.
+                    self.file = ContentFile(glb_bytes, name=glb_filename)
+                    logger.info(
+                        "Model3D '%s': converted %s → GLB (%d bytes)",
+                        self.title, self.original_format, len(glb_bytes),
+                    )
+                except Exception as exc:
+                    logger.error(
+                        "Model3D '%s': conversion failed — %s", self.title, exc
+                    )
+                    raise ValidationError(
+                        f"Could not convert '{self.original_format}' to GLB: {exc}"
+                    ) from exc
+
+            self.file_size = self.file.size if hasattr(self.file, 'size') else len(self.file.read())
+
         super().save(*args, **kwargs)
 
     class Meta:

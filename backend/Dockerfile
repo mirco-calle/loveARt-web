@@ -8,7 +8,15 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     poppler-utils \
     libmagic1 \
+    curl \
     && rm -rf /var/lib/apt/lists/*
+
+# Download FBX2glTF binary to /usr/local/bin (system PATH, outside the volume mount)
+# This ensures it's available even when ./backend is mounted as a volume in docker-compose
+RUN curl -fsSL \
+    -o /usr/local/bin/FBX2glTF \
+    https://github.com/facebookincubator/FBX2glTF/releases/download/v0.9.7/FBX2glTF-linux-x64 \
+    && chmod +x /usr/local/bin/FBX2glTF
 
 COPY requirements.txt .
 
