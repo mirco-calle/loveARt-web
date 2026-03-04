@@ -36,9 +36,11 @@ export const registerUser = (data: {
 export const loginUser = (data: { identifier: string; password: string }) =>
   api.post<AuthResponse>("/users/login/", data);
 
-/** Login with Google OAuth token */
-export const googleLogin = (accessToken: string) =>
-  api.post<AuthResponse>("/users/google/", { access_token: accessToken });
+/** Login with Google OAuth token (supports id_token/credential or access_token) */
+export const googleLogin = (payload: {
+  credential?: string;
+  access_token?: string;
+}) => api.post<AuthResponse>("/users/google/", payload);
 
 /** Get current user data */
 export const getMe = () => api.get<User>("/users/me/");

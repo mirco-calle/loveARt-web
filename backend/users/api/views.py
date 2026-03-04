@@ -77,6 +77,9 @@ def send_otp_email(user, code):
 
 
 
+import threading
+
+
 def create_and_send_otp(user):
     """
     Create (or refresh) an OTP for the user and send it via email.
@@ -86,7 +89,10 @@ def create_and_send_otp(user):
     EmailVerificationCode.objects.filter(user=user).delete()
     code = generate_otp()
     EmailVerificationCode.objects.create(user=user, code=code)
-    send_otp_email(user, code)
+    
+    # Enviar email asíncronamente para evitar que el request tarde de 3-5 segundos
+    threading.Thread(target=send_otp_email, args=(user, code)).start()
+    
     return code
 
 
@@ -304,35 +310,60 @@ def login_view(request):
 def google_login_view(request):
     """
     POST /api/users/google/
-    Receive Google OAuth access_token, validate it, and return JWT tokens.
+    Receive Google OAuth access_token or credential (JWT), validate it, and return JWT tokens.
     Google users are pre-verified (is_active=True).
     """
     access_token = request.data.get('access_token')
-    if not access_token:
+    credential = request.data.get('credential')
+
+    if not access_token and not credential:
         return Response(
-            {'error': 'access_token is required.'},
+            {'error': 'access_token or credential is required.'},
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-    try:
-        google_response = requests.get(
-            'https://www.googleapis.com/oauth2/v3/userinfo',
-            headers={'Authorization': f'Bearer {access_token}'},
-            timeout=10,
-        )
-        if google_response.status_code != 200:
+    email = None
+    first_name = ''
+    last_name = ''
+
+    if credential:
+        from google.oauth2 import id_token
+        from google.auth.transport import requests as google_requests
+        import os
+        try:
+            # Verify the JWT token locally (very fast, no extra HTTP request needed initially)
+            CLIENT_ID = getattr(settings, 'GOOGLE_OAUTH_CLIENT_ID', os.environ.get('GOOGLE_OAUTH_CLIENT_ID', ''))
+            idinfo = id_token.verify_oauth2_token(credential, google_requests.Request(), CLIENT_ID)
+            email = idinfo['email']
+            first_name = idinfo.get('given_name', idinfo.get('name', ''))
+            last_name = idinfo.get('family_name', '')
+        except ValueError as e:
             return Response(
-                {'error': 'Invalid Google token.'},
+                {'error': f'Invalid Google credential: {e}'},
                 status=status.HTTP_401_UNAUTHORIZED,
             )
-        google_data = google_response.json()
-    except requests.RequestException:
-        return Response(
-            {'error': 'Could not validate Google token.'},
-            status=status.HTTP_503_SERVICE_UNAVAILABLE,
-        )
+    elif access_token:
+        try:
+            google_response = requests.get(
+                'https://www.googleapis.com/oauth2/v3/userinfo',
+                headers={'Authorization': f'Bearer {access_token}'},
+                timeout=10,
+            )
+            if google_response.status_code != 200:
+                return Response(
+                    {'error': 'Invalid Google token.'},
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
+            google_data = google_response.json()
+            email = google_data.get('email')
+            first_name = google_data.get('given_name', google_data.get('name', ''))
+            last_name = google_data.get('family_name', '')
+        except requests.RequestException:
+            return Response(
+                {'error': 'Could not validate Google token.'},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
 
-    email = google_data.get('email')
     if not email:
         return Response(
             {'error': 'Google account has no email.'},
@@ -343,8 +374,8 @@ def google_login_view(request):
         email=email,
         defaults={
             'username': email.split('@')[0],
-            'first_name': google_data.get('given_name', google_data.get('name', '')),
-            'last_name': google_data.get('family_name', ''),
+            'first_name': first_name,
+            'last_name': last_name,
             'is_active': True,
         },
     )

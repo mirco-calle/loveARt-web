@@ -12,7 +12,10 @@ interface AuthState {
 
   // Actions
   login: (identifier: string, password: string) => Promise<void>;
-  loginWithGoogle: (accessToken: string) => Promise<void>;
+  loginWithGoogle: (payload: {
+    credential?: string;
+    access_token?: string;
+  }) => Promise<void>;
   logout: () => Promise<void>;
   fetchUser: () => Promise<void>;
   setSession: (user: User, access: string, refresh: string) => void;
@@ -73,10 +76,10 @@ export const useAuthStore = create<AuthState>()(
       },
 
       /** Google OAuth Login */
-      loginWithGoogle: async (googleToken) => {
+      loginWithGoogle: async (payload) => {
         set({ isLoading: true });
         try {
-          const { data } = await googleLogin(googleToken);
+          const { data } = await googleLogin(payload);
           set({
             user: data.user,
             access_token: data.access,

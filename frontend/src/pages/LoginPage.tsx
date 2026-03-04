@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-toastify";
-import { useGoogleLogin, TokenResponse } from "@react-oauth/google";
+import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
 import { ROUTES } from "../routes/routes";
 import { useAuthStore } from "../hooks/useAuthStore";
 import LoginForm from "../components/admin/LoginForm";
@@ -70,13 +70,15 @@ export const slideTrans = { duration: 0.26, ease: "easeInOut" as const };
 
 // ─── Selector view ────────────────────────────────────────────────────────────
 interface SelectorViewProps {
-  onGoogleLogin: () => void;
+  onGoogleSuccess: (response: CredentialResponse) => void;
+  onGoogleError: () => void;
   onEmailLogin: () => void;
   isLoading: boolean;
 }
 
 function SelectorView({
-  onGoogleLogin,
+  onGoogleSuccess,
+  onGoogleError,
   onEmailLogin,
   isLoading,
 }: SelectorViewProps) {
@@ -119,17 +121,25 @@ function SelectorView({
       </div>
 
       {/* ── Auth buttons ── */}
-      <div className="w-full flex flex-col gap-4 sm:gap-5">
-        <button
-          onClick={onGoogleLogin}
-          disabled={isLoading}
-          className="w-full h-14 sm:h-16 rounded-[20px] flex items-center justify-center gap-4 transition-all duration-300 active:scale-95 disabled:opacity-60 bg-white/5 border border-cyan-500/30 hover:border-cyan-500 shadow-lg shadow-cyan-500/10"
-        >
-          {isLoading ? <Spinner /> : <GoogleIcon />}
-          <span className="text-sm sm:text-base font-bold tracking-tight text-white">
-            Continuar con Google
-          </span>
-        </button>
+      <div className="w-full flex flex-col gap-4 sm:gap-5 relative">
+        {isLoading && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-background-dark/50 backdrop-blur-sm rounded-[20px]">
+            <Spinner />
+          </div>
+        )}
+
+        <div className="w-full flex justify-center overflow-hidden rounded-[20px] shadow-lg shadow-cyan-500/10">
+          <GoogleLogin
+            onSuccess={onGoogleSuccess}
+            onError={onGoogleError}
+            useOneTap
+            theme="filled_black"
+            shape="pill"
+            size="large"
+            text="continue_with"
+            width="320"
+          />
+        </div>
 
         {/* Divider */}
         <div className="flex items-center gap-4 px-2">
@@ -191,18 +201,21 @@ export default function LoginPage() {
     "register",
   );
 
-  const handleGoogleAuth = useGoogleLogin({
-    onSuccess: async (tokenResponse: TokenResponse) => {
-      try {
-        await loginWithGoogle(tokenResponse.access_token);
+  const handleGoogleSuccess = async (response: CredentialResponse) => {
+    try {
+      if (response.credential) {
+        await loginWithGoogle({ credential: response.credential });
         toast.success("¡Bienvenido, artista!");
         navigate(ROUTES.HOME);
-      } catch {
-        toast.error("Error con Google. Intenta de nuevo.");
       }
-    },
-    onError: () => toast.error("Falló la autenticación con Google"),
-  });
+    } catch {
+      toast.error("Error con Google. Intenta de nuevo.");
+    }
+  };
+
+  const handleGoogleError = () => {
+    toast.error("Falló la autenticación con Google");
+  };
 
   return (
     <div
@@ -230,7 +243,8 @@ export default function LoginPage() {
           {view === "selector" && (
             <SelectorView
               key="selector"
-              onGoogleLogin={() => handleGoogleAuth()}
+              onGoogleSuccess={handleGoogleSuccess}
+              onGoogleError={handleGoogleError}
               onEmailLogin={() => setView("login")}
               isLoading={isLoading}
             />
