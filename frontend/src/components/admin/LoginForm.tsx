@@ -175,14 +175,14 @@ function BackButton({ onClick }: { onClick: () => void }) {
       >
         <path d="m15 18-6-6 6-6" />
       </svg>
-      Back
+      Atrás
     </button>
   );
 }
 
 function AuthIcon() {
   return (
-    <div className="relative flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16">
+    <div className="relative flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 scale-75 sm:scale-90">
       <div
         className="absolute inset-0 rounded-full"
         style={{ background: "rgba(139,92,246,0.2)", filter: "blur(20px)" }}

@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-toastify";
-import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
+import { useGoogleLogin } from "@react-oauth/google";
 import { ROUTES } from "../routes/routes";
 import { useAuthStore } from "../hooks/useAuthStore";
 import LoginForm from "../components/admin/LoginForm";
@@ -10,10 +10,28 @@ import VerifyEmailForm from "../components/admin/VerifyEmailForm";
 import RegisterForm from "../components/admin/RegisterForm";
 import logo from "../assets/logo.png";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-export type AuthView = "selector" | "login" | "register" | "verify";
-
 // ─── Shared micro-components ──────────────────────────────────────────────────
+export const BackButton = ({ onClick }: { onClick: () => void }) => (
+  <button
+    onClick={onClick}
+    className="flex items-center gap-2 text-sm mb-6 transition-opacity hover:opacity-70 self-start shrink-0 text-slate-400/70"
+    aria-label="Back"
+  >
+    <svg
+      className="w-4 h-4"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="m15 18-6-6 6-6" />
+    </svg>
+    Atrás
+  </button>
+);
+
 export const Spinner = () => (
   <svg
     className="animate-spin w-5 h-5"
@@ -59,6 +77,52 @@ export const GoogleIcon = () => (
   </svg>
 );
 
+export const SparksIcon = () => (
+  <svg
+    width="80"
+    height="80"
+    viewBox="0 0 100 100"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    className="drop-shadow-[0_0_15px_rgba(168,85,247,0.6)]"
+  >
+    {/* Large center star */}
+    <motion.path
+      d="M45 15L51 44L80 50L51 56L45 85L39 56L10 50L39 44L45 15Z"
+      fill="#A855F7"
+      animate={{ opacity: [0.7, 1, 0.7], scale: [0.98, 1.05, 0.98] }}
+      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+    />
+    {/* Small top star */}
+    <motion.path
+      d="M75 18L77 26L85 28L77 30L75 38L73 30L65 28L73 26L75 18Z"
+      fill="#A855F7"
+      animate={{ opacity: [0.5, 1, 0.5], scale: [0.9, 1.1, 0.9] }}
+      transition={{
+        duration: 1.5,
+        repeat: Infinity,
+        ease: "easeInOut",
+        delay: 0.5,
+      }}
+    />
+    {/* Tiny right star */}
+    <motion.path
+      d="M82 65L83 70L88 71L83 72L82 77L81 72L76 71L81 70L82 65Z"
+      fill="#A855F7"
+      animate={{ opacity: [0.4, 0.9, 0.4] }}
+      transition={{
+        duration: 1.8,
+        repeat: Infinity,
+        ease: "easeInOut",
+        delay: 1,
+      }}
+    />
+  </svg>
+);
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+export type AuthView = "selector" | "login" | "register" | "verify";
+
 // ─── Animation presets ────────────────────────────────────────────────────────
 export const slideVariants = {
   initial: { opacity: 0, x: 24 },
@@ -70,9 +134,11 @@ export const slideTrans = { duration: 0.26, ease: "easeInOut" as const };
 
 // ─── Selector view ────────────────────────────────────────────────────────────
 interface SelectorViewProps {
-  onGoogleSuccess: (response: CredentialResponse) => void;
+  onGoogleSuccess: (access_token: string) => void;
   onGoogleError: () => void;
   onEmailLogin: () => void;
+  onGoRegister: () => void;
+  onGoBack: () => void;
   isLoading: boolean;
 }
 
@@ -80,8 +146,15 @@ function SelectorView({
   onGoogleSuccess,
   onGoogleError,
   onEmailLogin,
+  onGoRegister,
+  onGoBack,
   isLoading,
 }: SelectorViewProps) {
+  const login = useGoogleLogin({
+    onSuccess: (tokenResponse) => onGoogleSuccess(tokenResponse.access_token),
+    onError: onGoogleError,
+  });
+
   return (
     <motion.div
       key="selector"
@@ -92,12 +165,14 @@ function SelectorView({
       transition={slideTrans}
       className="flex-1 flex flex-col items-center justify-center gap-10 sm:gap-14 px-8 py-12 sm:px-12 md:px-16"
     >
+      <BackButton onClick={onGoBack} />
+
       {/* ── Branding ── */}
       <div className="flex flex-col items-center">
-        <div className="relative w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center mb-6">
+        <div className="relative w-24 h-24 flex items-center justify-center mb-4">
           <div
-            className="absolute inset-0 rounded-full animate-pulse"
-            style={{ background: "rgba(139,92,246,0.3)", filter: "blur(32px)" }}
+            className="absolute inset-0 rounded-full animate-pulse blur-[32px]"
+            style={{ background: "rgba(168,85,247,0.3)" }}
             aria-hidden="true"
           />
           <img
@@ -107,71 +182,71 @@ function SelectorView({
           />
         </div>
         <h1
-          className="text-5xl sm:text-6xl lg:text-7xl font-black tracking-tighter"
+          className="text-5xl sm:text-6xl font-black tracking-tight mb-2"
           style={{
-            color: "#8b5cf6",
-            textShadow: "0 0 30px rgba(139,92,246,0.4)",
+            color: "#A855F7",
+            textShadow: "0 0 40px rgba(168,85,247,0.5)",
           }}
         >
           LoveArt
         </h1>
-        <p className="text-[12px] uppercase tracking-[0.6em] mt-3 font-bold text-slate-500">
+        <p className="text-[10px] sm:text-[11px] uppercase tracking-[0.5em] font-bold text-slate-500">
           AR Creative Studio
         </p>
       </div>
 
       {/* ── Auth buttons ── */}
-      <div className="w-full flex flex-col gap-4 sm:gap-5 relative">
+      <div className="w-full flex flex-col gap-5 relative max-w-[320px]">
         {isLoading && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-background-dark/50 backdrop-blur-sm rounded-[20px]">
+          <div className="absolute inset-x-0 -bottom-10 z-10 flex items-center justify-center">
             <Spinner />
           </div>
         )}
 
-        <div className="w-full flex justify-center overflow-hidden rounded-[20px] shadow-lg shadow-cyan-500/10">
-          <GoogleLogin
-            onSuccess={onGoogleSuccess}
-            onError={onGoogleError}
-            useOneTap
-            theme="filled_black"
-            shape="pill"
-            size="large"
-            text="continue_with"
-            width="320"
-          />
-        </div>
+        {/* Google Button - Custom Styled */}
+        <button
+          onClick={() => login()}
+          disabled={isLoading}
+          className="w-full h-14 sm:h-16 rounded-2xl flex items-center justify-center gap-4 transition-all duration-300 active:scale-95 bg-transparent border border-cyan-400 group hover:bg-cyan-400/5 shadow-[0_0_20px_rgba(34,211,238,0.1)]"
+        >
+          <GoogleIcon />
+          <span className="text-sm sm:text-base font-semibold tracking-tight text-white group-hover:text-cyan-50">
+            Continue with Google
+          </span>
+        </button>
 
         {/* Divider */}
-        <div className="flex items-center gap-4 px-2">
+        <div className="flex items-center gap-4 px-2 my-2">
           <div className="h-px flex-1 bg-white/10" />
-          <span className="text-[10px] uppercase tracking-[0.3em] font-black text-slate-600">
-            o utiliza
+          <span className="text-[10px] uppercase tracking-[0.3em] font-medium text-slate-600">
+            or
           </span>
           <div className="h-px flex-1 bg-white/10" />
         </div>
 
+        {/* Email Button */}
         <button
           onClick={onEmailLogin}
-          className="w-full h-14 sm:h-16 rounded-[20px] flex items-center justify-center gap-4 transition-all duration-300 active:scale-95 bg-white/2 border border-violet-500/30 hover:border-violet-500 shadow-lg shadow-violet-500/10 text-white"
+          className="w-full h-14 sm:h-16 rounded-2xl flex items-center justify-center gap-4 transition-all duration-300 active:scale-95 bg-transparent border border-violet-500/80 group hover:bg-violet-500/5 shadow-[0_0_20px_rgba(139,92,246,0.1)]"
         >
           <span className="material-symbols-outlined text-violet-400">
             mail
           </span>
-          <span className="text-sm sm:text-base font-bold tracking-tight">
-            Acceso por Email
+          <span className="text-sm sm:text-base font-semibold tracking-tight text-white group-hover:text-violet-50">
+            Login with Email
           </span>
         </button>
       </div>
 
       {/* ── Footer ── */}
-      <div className="flex flex-col items-center gap-6">
-        <Link
-          to={ROUTES.LANDING}
-          className="text-xs font-bold uppercase tracking-widest text-slate-600 hover:text-white transition-colors"
+      <div className="flex flex-col items-center gap-8 mt-4">
+        <button
+          onClick={onGoRegister}
+          className="text-xs sm:text-sm font-bold tracking-wide text-fuchsia-500 hover:text-fuchsia-400 transition-colors"
         >
-          ← Volver al inicio
-        </Link>
-        <div className="w-32 h-1.5 rounded-full bg-white/5" />
+          New here? Sign up with Google
+        </button>
+        <div className="w-32 h-1 rounded-full bg-white/5" />
       </div>
     </motion.div>
   );
@@ -181,7 +256,7 @@ function SelectorView({
 function AuthCard({ children }: { children: React.ReactNode }) {
   return (
     <motion.div
-      className="relative z-10 w-full flex flex-col min-h-screen sm:min-h-0 sm:max-w-md sm:rounded-[48px] sm:border border-white/10 bg-background-dark/90 backdrop-blur-3xl shadow-2xl overflow-hidden"
+      className="relative z-10 w-full flex flex-col min-h-screen sm:min-h-0 sm:max-w-md sm:rounded-[48px] sm:border border-white/5 bg-background-dark/90 backdrop-blur-3xl shadow-2xl overflow-hidden"
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
@@ -201,13 +276,11 @@ export default function LoginPage() {
     "register",
   );
 
-  const handleGoogleSuccess = async (response: CredentialResponse) => {
+  const handleGoogleSuccess = async (access_token: string) => {
     try {
-      if (response.credential) {
-        await loginWithGoogle({ credential: response.credential });
-        toast.success("¡Bienvenido, artista!");
-        navigate(ROUTES.HOME);
-      }
+      await loginWithGoogle({ access_token });
+      toast.success("¡Bienvenido, artista!");
+      navigate(ROUTES.HOME);
     } catch {
       toast.error("Error con Google. Intenta de nuevo.");
     }
@@ -230,12 +303,12 @@ export default function LoginPage() {
         className="fixed inset-0 overflow-hidden pointer-events-none"
         aria-hidden="true"
       >
-        <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] rounded-full bg-primary/10 blur-[140px] animate-pulse" />
+        <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] rounded-full bg-violet-600/10 blur-[140px] animate-pulse" />
         <div
-          className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] rounded-full bg-secondary/10 blur-[140px] animate-pulse"
+          className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] rounded-full bg-cyan-600/10 blur-[140px] animate-pulse"
           style={{ animationDelay: "2s" }}
         />
-        <div className="grid-bg absolute inset-0 opacity-[0.1]" />
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150" />
       </div>
 
       <AuthCard>
@@ -246,6 +319,8 @@ export default function LoginPage() {
               onGoogleSuccess={handleGoogleSuccess}
               onGoogleError={handleGoogleError}
               onEmailLogin={() => setView("login")}
+              onGoRegister={() => setView("register")}
+              onGoBack={() => navigate(ROUTES.LANDING)}
               isLoading={isLoading}
             />
           )}
