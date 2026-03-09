@@ -1,8 +1,10 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ROUTES } from "../routes/routes";
 import NeonButton from "../components/ui/NeonButton";
 import logo from "../assets/logo.png";
+import CoreAPI, { AppBuild } from "../api/Core";
 
 const FEATURES = [
   {
@@ -41,6 +43,28 @@ const fadeUp = {
 };
 
 export default function LandingPage() {
+  const [latestBuild, setLatestBuild] = useState<AppBuild | null>(null);
+
+  useEffect(() => {
+    const fetchBuild = async () => {
+      try {
+        const build = await CoreAPI.getLatestBuild();
+        setLatestBuild(build);
+      } catch (error) {
+        console.error("Error fetching latest build:", error);
+      }
+    };
+    fetchBuild();
+  }, []);
+
+  const handleDownload = () => {
+    if (latestBuild?.apk_file) {
+      window.open(latestBuild.apk_file, "_blank");
+    } else {
+      alert("La aplicación no está disponible temporalmente.");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background-dark text-white font-display overflow-x-hidden">
       {/* ──── HEADER ──── */}
@@ -116,9 +140,10 @@ export default function LandingPage() {
             <NeonButton
               variant="secondary"
               className="h-14 sm:h-16 text-lg px-8 flex-1 sm:flex-none"
+              onClick={handleDownload}
             >
               <span className="material-symbols-outlined">download</span>
-              Descargar APK
+              Descargar APK {latestBuild ? `v${latestBuild.version}` : ""}
             </NeonButton>
             <Link to={ROUTES.LOGIN} className="flex-1 sm:flex-none">
               <NeonButton

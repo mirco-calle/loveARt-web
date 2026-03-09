@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'image_tracking',
     'architecture_ar',
     'users',
+    'core',
 ]
 
 MIDDLEWARE = [

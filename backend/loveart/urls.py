@@ -26,6 +26,7 @@ def api_root(request):
             'users': '/api/users/',
             'tracking': '/api/tracking/',
             'architecture': '/api/architecture/',
+            'core': '/api/core/',
             'docs': '/api/docs/',
             'schema': '/api/schema/',
         }
@@ -44,6 +45,7 @@ urlpatterns = [
     path('api/users/', include('users.api.routes')),
     path('api/tracking/', include('image_tracking.api.router')),
     path('api/architecture/', include('architecture_ar.api.router')),
+    path('api/core/', include('core.api.router')),
 
     # API Documentation (Swagger / ReDoc)
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
