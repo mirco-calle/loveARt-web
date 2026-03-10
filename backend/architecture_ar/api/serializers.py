@@ -35,6 +35,7 @@ class BlueprintSerializer(serializers.ModelSerializer):
             'id', 'user', 'title', 'description',
             'image', 'image_url', 
             'file_size', 'width', 'height', 'original_format',
+            'is_active', 'is_public',
             'model3d', 'created_at', 'updated_at',
         ]
         read_only_fields = ['id', 'user', 'created_at', 'updated_at']
@@ -76,7 +77,7 @@ class ArchitectureDataForUnitySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Blueprint
-        fields = ['id', 'title', 'image_url', 'model3d_url', 'model3d_scale']
+        fields = ['id', 'title', 'image_url', 'model3d_url', 'model3d_scale', 'is_active']
 
     def get_image_url(self, obj):
         request = self.context.get('request')

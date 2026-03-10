@@ -35,6 +35,7 @@ class TrackingImageSerializer(serializers.ModelSerializer):
             'id', 'user', 'title', 'description',
             'aspect_ratio', 'image', 'image_url', 
             'file_size', 'width', 'height',
+            'is_active', 'is_public',
             'video', 'created_at', 'updated_at',
         ]
         read_only_fields = ['id', 'user', 'created_at', 'updated_at']
@@ -75,7 +76,7 @@ class TrackingDataForUnitySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TrackingImage
-        fields = ['id', 'title', 'image_url', 'video_url']
+        fields = ['id', 'title', 'image_url', 'video_url', 'is_active']
 
     def get_image_url(self, obj):
         request = self.context.get('request')

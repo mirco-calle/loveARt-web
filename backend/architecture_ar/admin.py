@@ -11,8 +11,8 @@ class Model3DInline(admin.StackedInline):
 
 @admin.register(Blueprint)
 class BlueprintAdmin(admin.ModelAdmin):
-    list_display = ['title', 'user', 'created_at']
-    list_filter = ['created_at']
+    list_display = ['title', 'user', 'is_active', 'is_public', 'created_at']
+    list_filter = ['is_active', 'is_public', 'created_at']
     search_fields = ['title', 'user__username']
     readonly_fields = ['created_at', 'updated_at']
     inlines = [Model3DInline]
