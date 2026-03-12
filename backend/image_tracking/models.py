@@ -10,7 +10,7 @@ from django.core.files.images import get_image_dimensions
 
 # Constantes de optimización
 MAX_IMAGE_SIZE_MB = 2 
-MAX_VIDEO_SIZE_MB = 20
+MAX_VIDEO_SIZE_MB = 40
 
 def validate_image_size(value):
     filesize = value.size

@@ -213,7 +213,7 @@ export default function ImageTrackingPage() {
             <span>VIDEO:</span>
             <span className="text-slate-300">MP4 / H.264</span>
             <span className="w-1 h-1 bg-white/20 rounded-full" />
-            <span className="text-slate-400">MAX 15MB</span>
+            <span className="text-slate-400">MAX 40MB</span>
           </div>
         </div>
       </motion.div>
