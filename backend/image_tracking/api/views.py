@@ -9,6 +9,7 @@ from image_tracking.api.serializers import (
     TrackingImageCreateSerializer,
     TrackingVideoSerializer,
     TrackingVideoUploadSerializer,
+    TrackingExperienceDataSerializer,
     TrackingDataForUnitySerializer,
 )
 
@@ -173,7 +174,7 @@ def unity_tracking_data(request):
         .filter(user=request.user)
         .select_related('video')
     )
-    serializer = TrackingDataForUnitySerializer(
+    serializer = TrackingExperienceDataSerializer(
         images, many=True, context={'request': request},
     )
     return Response({
@@ -195,7 +196,7 @@ def unity_tracking_catalog(request):
         .filter(is_public=True)
         .select_related('video')
     )
-    serializer = TrackingDataForUnitySerializer(
+    serializer = TrackingExperienceDataSerializer(
         images, many=True, context={'request': request},
     )
     return Response({

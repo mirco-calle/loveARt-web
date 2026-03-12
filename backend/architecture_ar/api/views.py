@@ -9,6 +9,7 @@ from architecture_ar.api.serializers import (
     BlueprintCreateSerializer,
     Model3DSerializer,
     Model3DUploadSerializer,
+    ArchitectureExperienceDataSerializer,
     ArchitectureDataForUnitySerializer,
 )
 
@@ -171,7 +172,7 @@ def unity_architecture_data(request):
         .filter(user=request.user)
         .select_related('model3d')
     )
-    serializer = ArchitectureDataForUnitySerializer(
+    serializer = ArchitectureExperienceDataSerializer(
         blueprints, many=True, context={'request': request},
     )
     return Response({
@@ -193,7 +194,7 @@ def unity_architecture_catalog(request):
         .filter(is_public=True)
         .select_related('model3d')
     )
-    serializer = ArchitectureDataForUnitySerializer(
+    serializer = ArchitectureExperienceDataSerializer(
         blueprints, many=True, context={'request': request},
     )
     return Response({

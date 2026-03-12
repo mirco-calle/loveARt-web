@@ -68,8 +68,14 @@ class TrackingImage(models.Model):
     width = models.PositiveIntegerField(null=True, blank=True)
     height = models.PositiveIntegerField(null=True, blank=True)
     
+    # New metadata fields for Unity
+    resolution = models.CharField(max_length=20, blank=True, null=True, help_text="Resolución de la imagen (ej: 1920x1080)")
+    physical_width = models.FloatField(default=0.1, help_text="Ancho físico de la imagen en metros (para AR)")
+    image_size = models.FloatField(default=0.0, help_text="Tamaño de la imagen en MB")
+    video_size = models.FloatField(default=0.0, help_text="Tamaño del video en MB")
+    
     is_active = models.BooleanField(default=True)
-    is_public = models.BooleanField(default=False)
+    is_public = models.BooleanField(default=False, help_text="True=Proyecto público, False=Privado")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -96,6 +102,8 @@ class TrackingImage(models.Model):
             self.width = img.width
             self.height = img.height
             self.file_size = output.tell()
+            self.resolution = f"{img.width}x{img.height}"
+            self.image_size = round(self.file_size / (1024 * 1024), 2)
             
             output.seek(0)
             curr_name = os.path.splitext(self.image.name)[0]
@@ -135,6 +143,12 @@ class TrackingVideo(models.Model):
         if self.video:
             self.file_size = self.video.size
         super().save(*args, **kwargs)
+        
+        # Actualizar el tamaño del video en la imagen padre después de guardar
+        if self.video and self.tracking_image:
+            self.tracking_image.video_size = round(self.file_size / (1024 * 1024), 2)
+            # Evitar recursión infinita usando update_fields
+            type(self.tracking_image).objects.filter(pk=self.tracking_image.pk).update(video_size=self.tracking_image.video_size)
 
     class Meta:
         verbose_name = 'Tracking Video'

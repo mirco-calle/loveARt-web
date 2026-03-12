@@ -27,6 +27,26 @@ export interface Model3D {
   file_size?: number;
 }
 
+export interface ArchitectureExperienceData {
+  id: number;
+  name: string;
+  title: string;
+  description: string;
+  image_url: string;
+  model3d_url: string | null;
+  model3d_scale: number;
+  model_url: string | null;
+  pdf_url: string | null;
+  preview_image_url: string;
+  resolution: string | null;
+  image_size: number;
+  model_size: number;
+  is_public: boolean;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 /** List all blueprints for the authenticated user */
 export const getBlueprints = () =>
   api.get<{ results: Blueprint[] }>("/architecture/blueprints/");
@@ -50,3 +70,13 @@ export const deleteBlueprint = (blueprintId: number) =>
 /** Delete 3D model for a blueprint */
 export const deleteModel3D = (blueprintId: number) =>
   api.delete(`/architecture/blueprints/${blueprintId}/model3d/delete/`);
+
+// --- Unity Experience Endpoints ---
+
+/** Get user's architecture experiences (Unity Format) */
+export const getUnityArchitectureMe = () =>
+  api.get<{ count: number; results: ArchitectureExperienceData[] }>("/architecture/unity/me/");
+
+/** Get public architecture catalog (Unity Format) */
+export const getUnityArchitectureCatalog = () =>
+  api.get<{ count: number; results: ArchitectureExperienceData[] }>("/architecture/unity/catalog/");

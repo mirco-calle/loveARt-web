@@ -56,8 +56,13 @@ class Blueprint(models.Model):
     height = models.PositiveIntegerField(null=True, blank=True)
     original_format = models.CharField(max_length=10, blank=True, null=True, help_text="Formato original (PDF, PNG, etc)")
     
+    # New metadata fields for Unity
+    resolution = models.CharField(max_length=20, blank=True, null=True, help_text="Resolución de la vista previa (ej: 1920x1080)")
+    image_size = models.FloatField(default=0.0, help_text="Tamaño de la imagen preview en MB")
+    model_size = models.FloatField(default=0.0, help_text="Tamaño del archivo 3D/PDF en MB")
+    
     is_active = models.BooleanField(default=True)
-    is_public = models.BooleanField(default=False)
+    is_public = models.BooleanField(default=False, help_text="True=Proyecto público, False=Privado")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -93,6 +98,8 @@ class Blueprint(models.Model):
                 self.width = img.width
                 self.height = img.height
                 self.file_size = output.tell()
+                self.resolution = f"{img.width}x{img.height}"
+                self.image_size = round(self.file_size / (1024 * 1024), 2)
                 
                 output.seek(0)
                 curr_name = os.path.splitext(self.image.name)[0]
@@ -182,6 +189,11 @@ class Model3D(models.Model):
             self.file_size = self.file.size if hasattr(self.file, 'size') else len(self.file.read())
 
         super().save(*args, **kwargs)
+        
+        # Actualizar el tamaño del modelo en el blueprint padre
+        if self.file and self.blueprint:
+            self.blueprint.model_size = round(self.file_size / (1024 * 1024), 2)
+            type(self.blueprint).objects.filter(pk=self.blueprint.pk).update(model_size=self.blueprint.model_size)
 
     class Meta:
         verbose_name = '3D Model'

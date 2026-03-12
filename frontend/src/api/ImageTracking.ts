@@ -26,6 +26,23 @@ export interface TrackingVideo {
   file_size?: number;
 }
 
+export interface TrackingExperienceData {
+  id: number;
+  name: string;
+  title: string;
+  description: string;
+  image_url: string;
+  video_url: string | null;
+  physical_width: number;
+  resolution: string | null;
+  image_size: number;
+  video_size: number;
+  is_public: boolean;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 /** List all tracking images for the authenticated user */
 export const getTrackingImages = () =>
   api.get<{ results: TrackingImage[] }>("/tracking/images/");
@@ -49,3 +66,13 @@ export const deleteTrackingImage = (imageId: number) =>
 /** Delete video for a tracking image */
 export const deleteTrackingVideo = (imageId: number) =>
   api.delete(`/tracking/images/${imageId}/video/delete/`);
+
+// --- Unity Experience Endpoints ---
+
+/** Get user's tracking experiences (Unity Format) */
+export const getUnityTrackingMe = () =>
+  api.get<{ count: number; results: TrackingExperienceData[] }>("/tracking/unity/me/");
+
+/** Get public tracking catalog (Unity Format) */
+export const getUnityTrackingCatalog = () =>
+  api.get<{ count: number; results: TrackingExperienceData[] }>("/tracking/unity/catalog/");

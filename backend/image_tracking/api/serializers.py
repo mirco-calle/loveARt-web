@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.utils.text import slugify
 
 from image_tracking.models import TrackingImage, TrackingVideo
 
@@ -35,6 +36,7 @@ class TrackingImageSerializer(serializers.ModelSerializer):
             'id', 'user', 'title', 'description',
             'aspect_ratio', 'image', 'image_url', 
             'file_size', 'width', 'height',
+            'resolution', 'image_size', 'video_size', 'physical_width',
             'is_active', 'is_public',
             'video', 'created_at', 'updated_at',
         ]
@@ -66,17 +68,26 @@ class TrackingVideoUploadSerializer(serializers.ModelSerializer):
         read_only_fields = ['id']
 
 
-class TrackingDataForUnitySerializer(serializers.ModelSerializer):
+class TrackingExperienceDataSerializer(serializers.ModelSerializer):
     """
-    Lightweight serializer optimized for Unity consumption.
-    Returns only the essential data: image URL, video URL, and metadata.
+    Complete serializer for Unity as requested by metadata instruction.
+    Maps TrackingImage fields + related video info.
     """
+    name = serializers.SerializerMethodField()
     image_url = serializers.SerializerMethodField()
     video_url = serializers.SerializerMethodField()
 
     class Meta:
         model = TrackingImage
-        fields = ['id', 'title', 'image_url', 'video_url', 'is_active']
+        fields = [
+            'id', 'name', 'title', 'description',
+            'image_url', 'video_url', 'physical_width',
+            'resolution', 'image_size', 'video_size', 'is_public',
+            'is_active', 'created_at', 'updated_at'
+        ]
+
+    def get_name(self, obj):
+        return slugify(obj.title).replace('-', '_')
 
     def get_image_url(self, obj):
         request = self.context.get('request')
@@ -89,3 +100,9 @@ class TrackingDataForUnitySerializer(serializers.ModelSerializer):
         if hasattr(obj, 'video') and obj.video and obj.video.video and request:
             return request.build_absolute_uri(obj.video.video.url)
         return None
+
+
+class TrackingDataForUnitySerializer(TrackingExperienceDataSerializer):
+    """Maintain backward compatibility name if needed, using the new complete format."""
+    class Meta(TrackingExperienceDataSerializer.Meta):
+        pass
