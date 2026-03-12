@@ -14,21 +14,25 @@ import {
 } from "../api/ImageTracking";
 
 interface UploadState {
+  title: string;
   imageFile: File | null;
   videoFile: File | null;
   isPublic: boolean;
   imagePreview: string | null;
-  aspectRatio: "16:9" | "9:16";
+  videoPreview: string | null;
+  aspectRatio: "16:9" | "9:16" | "1:1" | "940:788";
   uploading: boolean;
   progress: number;
 }
 
 export default function ImageTrackingPage() {
   const [state, setState] = useState<UploadState>({
+    title: "",
     imageFile: null,
     videoFile: null,
     isPublic: false,
     imagePreview: null,
+    videoPreview: null,
     aspectRatio: "16:9",
     uploading: false,
     progress: 0,
@@ -40,7 +44,6 @@ export default function ImageTrackingPage() {
     const fetchProjects = async () => {
       try {
         const { data } = await getTrackingImages();
-        // Assuming API returns { results: [...] } based on interface, but checking structure
         setProjects(Array.isArray(data) ? data : data.results || []);
       } catch (error) {
         console.error("Error fetching projects:", error);
@@ -51,15 +54,21 @@ export default function ImageTrackingPage() {
 
   const handleImageSelect = useCallback((file: File) => {
     const preview = URL.createObjectURL(file);
-    setState((prev) => ({ ...prev, imageFile: file, imagePreview: preview }));
+    setState((prev) => ({
+      ...prev,
+      imageFile: file,
+      imagePreview: preview,
+      title: prev.title || file.name.split(".")[0],
+    }));
     toast.success(`Imagen seleccionada: ${file.name}`);
   }, []);
 
   const handleVideoSelect = useCallback((file: File) => {
-    setState((prev) => ({ ...prev, videoFile: file }));
+    const preview = URL.createObjectURL(file);
+    setState((prev) => ({ ...prev, videoFile: file, videoPreview: preview }));
     toast.success(`Video seleccionado: ${file.name}`);
   }, []);
-  // ... (rest of the file)
+
   const handleUpload = async () => {
     if (!state.imageFile || !state.videoFile) {
       toast.error("Selecciona una imagen y un video");
@@ -72,7 +81,7 @@ export default function ImageTrackingPage() {
       // Step 1: Upload image
       const imageData = new FormData();
       imageData.append("image", state.imageFile);
-      imageData.append("title", state.imageFile.name);
+      imageData.append("title", state.title || state.imageFile.name);
       imageData.append("aspect_ratio", state.aspectRatio);
       imageData.append("is_public", String(state.isPublic));
 
@@ -98,10 +107,12 @@ export default function ImageTrackingPage() {
       // Reset form
       setTimeout(() => {
         setState({
+          title: "",
           imageFile: null,
           videoFile: null,
           isPublic: false,
           imagePreview: null,
+          videoPreview: null,
           aspectRatio: "16:9",
           uploading: false,
           progress: 0,
@@ -133,6 +144,26 @@ export default function ImageTrackingPage() {
         </p>
       </motion.div>
 
+      {/* Project Name Input */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.05 }}
+      >
+        <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2 block ml-1">
+          Nombre del Proyecto
+        </label>
+        <input
+          type="text"
+          value={state.title}
+          onChange={(e) =>
+            setState((prev) => ({ ...prev, title: e.target.value }))
+          }
+          placeholder="Ej: Mi Increíble Aumento"
+          className="w-full bg-white/2 border border-white/5 rounded-2xl p-4 text-white focus:outline-none focus:border-cyan-500/50 transition-colors"
+        />
+      </motion.div>
+
       {/* Aspect Ratio Selector - Compact Version */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
@@ -146,7 +177,7 @@ export default function ImageTrackingPage() {
           </span>
         </div>
 
-        <div className="flex gap-1.5">
+        <div className="flex flex-wrap gap-1.5">
           <button
             type="button"
             onClick={() =>
@@ -179,6 +210,40 @@ export default function ImageTrackingPage() {
               rectangle
             </span>
             <span className="text-xs font-bold tracking-tight">9:16</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() =>
+              setState((prev) => ({ ...prev, aspectRatio: "1:1" }))
+            }
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all duration-300 ${
+              state.aspectRatio === "1:1"
+                ? "bg-cyan-500/10 border-cyan-500/40 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
+                : "bg-white/2 border-white/5 text-slate-500 hover:bg-white/5"
+            }`}
+          >
+            <span className="material-symbols-outlined text-base leading-none">
+              square
+            </span>
+            <span className="text-xs font-bold tracking-tight">1:1</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() =>
+              setState((prev) => ({ ...prev, aspectRatio: "940:788" }))
+            }
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all duration-300 ${
+              state.aspectRatio === "940:788"
+                ? "bg-cyan-500/10 border-cyan-500/40 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
+                : "bg-white/2 border-white/5 text-slate-500 hover:bg-white/5"
+            }`}
+          >
+            <span className="material-symbols-outlined text-base leading-none">
+              facebook
+            </span>
+            <span className="text-xs font-bold tracking-tight">FB</span>
           </button>
         </div>
       </motion.div>
@@ -220,57 +285,26 @@ export default function ImageTrackingPage() {
 
       {/* Upload cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-8">
-        <motion.div
-          animate={{ scale: state.imageFile ? 1 : 1 }}
-          whileHover={{ y: -5 }}
-          className="relative"
-        >
-          <UploadCard
-            icon="image"
-            title="Imagen de Seguimiento"
-            formats="JPG, PNG, WEBP"
-            accept="image/*,.jpg,.jpeg,.png,.webp"
-            onFileSelect={handleImageSelect}
-            disabled={state.uploading}
-          />
-          {state.imageFile && (
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              className="absolute -top-3 -right-3 w-8 h-8 bg-cyan-500 rounded-full flex items-center justify-center shadow-lg shadow-cyan-500/50 z-30"
-            >
-              <span className="material-symbols-outlined text-white text-sm">
-                check
-              </span>
-            </motion.div>
-          )}
-        </motion.div>
+        <UploadCard
+          icon="image"
+          title="Imagen de Seguimiento"
+          formats="JPG, PNG, WEBP"
+          accept="image/*,.jpg,.jpeg,.png,.webp"
+          onFileSelect={handleImageSelect}
+          disabled={state.uploading}
+          previewUrl={state.imagePreview}
+        />
 
-        <motion.div
-          animate={{ scale: state.videoFile ? 1 : 1 }}
-          whileHover={{ y: -5 }}
-          className="relative"
-        >
-          <UploadCard
-            icon="movie"
-            title="Video de Aumento"
-            formats="MP4, MOV, WebM"
-            accept="video/*,.mp4,.mov,.webm"
-            onFileSelect={handleVideoSelect}
-            disabled={state.uploading}
-          />
-          {state.videoFile && (
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              className="absolute -top-3 -right-3 w-8 h-8 bg-violet-600 rounded-full flex items-center justify-center shadow-lg shadow-violet-600/50 z-30"
-            >
-              <span className="material-symbols-outlined text-white text-sm">
-                check
-              </span>
-            </motion.div>
-          )}
-        </motion.div>
+        <UploadCard
+          icon="movie"
+          title="Video de Aumento"
+          formats="MP4, MOV, WebM"
+          accept="video/*,.mp4,.mov,.webm"
+          onFileSelect={handleVideoSelect}
+          disabled={state.uploading}
+          previewUrl={state.videoPreview}
+          isVideoPreview
+        />
       </div>
 
       {/* Preview + settings */}

@@ -28,12 +28,18 @@ def validate_aspect_ratio(instance, value):
         return
     
     aspect_ratio = width / height
-    if instance.aspect_ratio == '16:9':
-        target = 16 / 9
-    else: 
-        target = 9 / 16
-        
+    
+    # Mapa de relaciones de aspecto objetivo
+    ratios = {
+        '16:9': 16 / 9,
+        '9:16': 9 / 16,
+        '1:1': 1.0,
+        '940:788': 940 / 788,
+    }
+    
+    target = ratios.get(instance.aspect_ratio, 16/9)
     tolerance = 0.2 
+    
     if not (target - tolerance <= aspect_ratio <= target + tolerance):
         raise ValidationError(f"La imagen no coincide con el formato {instance.aspect_ratio} seleccionado.")
 
@@ -51,6 +57,8 @@ class TrackingImage(models.Model):
     ASPECT_RATIO_CHOICES = [
         ('16:9', 'Horizontal (16:9)'),
         ('9:16', 'Vertical (9:16)'),
+        ('1:1', 'Cuadrado (1:1)'),
+        ('940:788', 'Facebook (940x788)'),
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tracking_images')
