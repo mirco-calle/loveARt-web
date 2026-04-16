@@ -4,6 +4,7 @@ import { ROUTES } from "../routes/routes";
 import { useAuthStore } from "../hooks/useAuthStore";
 import { motion } from "framer-motion";
 import ModalConfirm from "../components/common/ModalConfirm";
+import UserMenuMobile from "../components/common/UserMenuMobile";
 import logo from "../assets/logo.png";
 
 const NAV_ITEMS = [
@@ -117,9 +118,10 @@ export default function AppLayout() {
               </div>
               <h1 className="text-xl font-bold tracking-tight">LoveArt</h1>
             </div>
-            <div className="h-9 w-9 rounded-full border border-white/10 overflow-hidden shadow-lg shadow-primary/10">
-              <div className="h-full w-full bg-linear-to-tr from-primary to-blue-600" />
-            </div>
+            <UserMenuMobile
+              user={user}
+              onLogout={() => setShowLogoutModal(true)}
+            />
           </div>
         </header>
 
