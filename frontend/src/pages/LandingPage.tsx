@@ -118,7 +118,7 @@ export default function LandingPage() {
           >
             DALE <span className="text-primary glow-text">VIDA</span> A TU{" "}
             <br className="hidden sm:block" />
-            <span className="text-linear-to-r from-secondary to-primary bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-secondary to-primary bg-clip-text text-transparent">
               IMAGINACIÓN
             </span>
           </motion.h2>
@@ -284,25 +284,24 @@ export default function LandingPage() {
 
           <nav className="flex flex-wrap justify-center gap-x-8 gap-y-4 text-xs font-bold uppercase tracking-widest text-slate-500">
             <Link to="#" className="hover:text-primary transition-colors">
-              Privacy Policy
+              Política de Privacidad
             </Link>
             <Link to="#" className="hover:text-primary transition-colors">
-              Terms of Service
+              Términos de Servicio
             </Link>
             <Link to="#" className="hover:text-primary transition-colors">
-              Documentation
+              Documentación
             </Link>
             <Link
               to={ROUTES.LOGIN}
               className="hover:text-primary transition-colors"
             >
-              Portal Login
+              Acceso al Portal
             </Link>
           </nav>
 
           <p className="text-[10px] text-slate-600 uppercase tracking-[0.2em] font-medium text-center">
-            © {new Date().getFullYear()} LoveArt AR Studio. Powered by Spatial
-            Engine v2.4
+            © {new Date().getFullYear()} LoveArt AR Studio. Creado por MircoDev
           </p>
         </div>
       </footer>
