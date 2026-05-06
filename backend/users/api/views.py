@@ -170,9 +170,15 @@ def verify_email_view(request):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-    # Activate user and remove OTP
+    # Activate user, mark email as verified, and remove OTP
     user.is_active = True
     user.save()
+
+    # Mark profile email as verified
+    profile, _ = UserProfile.objects.get_or_create(user=user)
+    profile.email_verified = True
+    profile.save(update_fields=['email_verified'])
+
     otp.delete()
 
     tokens = get_tokens_for_user(user)

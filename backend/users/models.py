@@ -22,6 +22,8 @@ class UserProfile(models.Model):
         null=True,
     )
     bio = models.TextField(blank=True, default='')
+    email_verified = models.BooleanField(default=False, help_text="Se activa automáticamente al verificar el OTP")
+    is_admin = models.BooleanField(default=False, help_text="Marcar para dar acceso de administrador en el portal frontend")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

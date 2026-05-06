@@ -9,6 +9,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.http import JsonResponse
 from django.shortcuts import redirect
+from loveart import views
 
 from drf_spectacular.views import (
     SpectacularAPIView,
@@ -46,6 +47,7 @@ urlpatterns = [
     path('api/tracking/', include('image_tracking.api.router')),
     path('api/architecture/', include('architecture_ar.api.router')),
     path('api/core/', include('core.api.router')),
+    path('api/v1/public-catalog/', views.global_public_catalog, name='public-catalog'),
 
     # API Documentation (Swagger / ReDoc)
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),

@@ -11,7 +11,7 @@ class UserProfileInline(admin.StackedInline):
     model = UserProfile
     can_delete = False
     verbose_name_plural = "Profile"
-    fields = ("avatar", "bio")
+    fields = ("avatar", "bio", "email_verified", "is_admin")
 
 
 # ── Custom User admin — shows email prominently ───────────────────────────────
@@ -46,7 +46,9 @@ admin.site.register(User, UserAdmin)
 
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ("user", "user_email", "created_at", "updated_at")
+    list_display = ("user", "user_email", "email_verified", "is_admin", "created_at", "updated_at")
+    list_editable = ("email_verified", "is_admin")
+    list_filter = ("email_verified", "is_admin")
     search_fields = ("user__username", "user__email")
     readonly_fields = ("created_at", "updated_at")
 
