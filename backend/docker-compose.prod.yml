@@ -1,9 +1,0 @@
-services:
-  web:
-    image: ghcr.io/${GITHUB_REPOSITORY_OWNER}/loveart-backend:latest
-    container_name: loveart-backend
-    restart: always
-    ports:
-      - "8000:8000"
-    env_file:
-      - .env
