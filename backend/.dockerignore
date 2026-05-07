@@ -1,48 +1,53 @@
-# GIT
+# Fly.io
+fly.toml
+
+# Version Control
 .git
 .gitignore
 
-# PYTHON / DJANGO
-__pycache__/
+# Python
+**/__pycache__/
 *.py[cod]
 *$py.class
-*.so
+*.pyo
+*.pyd
 .Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-
-# VIRTUAL ENVIRONMENTS
-.env
-.venv
-env/
+.venv/
 venv/
-ENV/
-env.bak/
-venv.bak/
+env/
+bin/
+lib/
+include/
+share/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
 
-# DATABASE
-db.sqlite3
-db.sqlite3-journal
-
-# LOCAL MEDIA & STATIC (Generally generated or mounted)
-staticfiles/
+# Django
+backend/uploads/
 uploads/
-media/
+staticfiles/
+static/
+*.sqlite3
+db.sqlite3
 
-# IDE
-.vscode
-.idea
+# Environment and Secrets
+.env
+*.env
+secrets.json
+
+# IDEs and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Documentation
+README.md
+DEPLOY_STRATEGY.md
+*.md

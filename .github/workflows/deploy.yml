@@ -1,0 +1,72 @@
+name: Deploy Backend to AWS
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/**'
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          target: production
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/loveart-backend:latest
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            mkdir -p ~/loveart
+            cd ~/loveart
+            
+            # Login en GHCR
+            echo "${{ secrets.GH_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            
+            # Crear el archivo docker-compose.prod.yml dinámicamente
+            cat <<EOF > docker-compose.prod.yml
+            services:
+              web:
+                image: ghcr.io/${{ github.repository_owner }}/loveart-backend:latest
+                container_name: loveart-backend
+                restart: always
+                ports:
+                  - "8000:8000"
+                env_file:
+                  - .env
+            EOF
+            
+            # Pull y Restart
+            docker compose -f docker-compose.prod.yml pull
+            docker compose -f docker-compose.prod.yml up -d
+            
+            # Limpiar imágenes viejas para ahorrar espacio (t3.micro tiene poco disco)
+            docker image prune -f
