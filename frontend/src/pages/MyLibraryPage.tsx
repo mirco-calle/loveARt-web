@@ -135,7 +135,7 @@ export default function MyLibraryPage() {
       {/* Stats Dashboard */}
       {/* ... (Keep same stats dashboard) */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <GlassCard className="p-5 flex flex-col justify-between border-white/10 hover:border-primary/30 transition-colors">
+        <GlassCard className="p-4 md:p-5 flex flex-col justify-between border-white/10 hover:border-primary/30 transition-colors">
           <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
             Total
           </span>
@@ -145,7 +145,7 @@ export default function MyLibraryPage() {
             </p>
           </div>
         </GlassCard>
-        <GlassCard className="p-5 flex flex-col justify-between border-white/10 hover:border-primary/30 transition-colors">
+        <GlassCard className="p-4 md:p-5 flex flex-col justify-between border-white/10 hover:border-primary/30 transition-colors">
           <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-500/70">
             Públicos
           </span>
@@ -155,7 +155,7 @@ export default function MyLibraryPage() {
             </p>
           </div>
         </GlassCard>
-        <GlassCard className="p-5 flex flex-col justify-between border-white/10 hover:border-primary/30 transition-colors">
+        <GlassCard className="p-4 md:p-5 flex flex-col justify-between border-white/10 hover:border-primary/30 transition-colors">
           <span className="text-[10px] font-bold uppercase tracking-widest text-amber-500/70">
             Privados
           </span>

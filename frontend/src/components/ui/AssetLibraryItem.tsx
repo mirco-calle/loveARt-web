@@ -37,10 +37,10 @@ export default function AssetLibraryItem({
   return (
     <motion.div
       whileHover={{ y: -2 }}
-      className="group relative flex flex-col sm:flex-row gap-4 bg-white/2 hover:bg-white/5 p-4 rounded-3xl border border-white/5 hover:border-white/10 transition-all duration-300 shadow-xl"
+      className="group relative flex flex-col sm:flex-row gap-4 bg-white/2 hover:bg-white/5 p-3 sm:p-4 rounded-2xl sm:rounded-3xl border border-white/5 hover:border-white/10 transition-all duration-300 shadow-xl"
     >
       {/* Thumbnail Area */}
-      <div className="relative h-32 sm:h-24 w-full sm:w-24 shrink-0 bg-white/5 rounded-2xl overflow-hidden border border-white/5">
+      <div className="relative h-24 w-full sm:w-24 shrink-0 bg-white/5 rounded-xl sm:rounded-2xl overflow-hidden border border-white/5">
         {thumbnailUrl ? (
           <img
             src={thumbnailUrl}
@@ -81,8 +81,8 @@ export default function AssetLibraryItem({
                 {isPublic ? "Public" : "Private"}
               </span>
 
-              {/* Action Buttons inside the header flow */}
-              <div className="flex items-center gap-1 ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              {/* Action Buttons - Always visible on small screens, hover on large */}
+              <div className="flex items-center gap-1 ml-1 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300">
                 {onOptions && (
                   <button
                     onClick={(e) => {

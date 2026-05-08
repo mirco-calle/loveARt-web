@@ -389,7 +389,7 @@ export default function ImageTrackingPage() {
             fullWidth
             onClick={handleUpload}
             disabled={!state.imageFile || !state.videoFile || state.uploading}
-            className="h-14 text-lg"
+            className="h-12 md:h-14 text-base md:text-lg"
           >
             <span className="material-symbols-outlined">
               {state.uploading ? "sync" : "rocket_launch"}

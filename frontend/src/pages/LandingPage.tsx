@@ -109,7 +109,7 @@ export default function LandingPage() {
         <div className="grid-bg absolute inset-0 pointer-events-none opacity-[0.2]" />
 
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center relative">
-          <motion.div initial="hidden" animate="visible">
+          <motion.div initial="hidden" animate="visible" className="text-center lg:text-left flex flex-col items-center lg:items-start">
             <motion.span
               variants={fadeUp}
               custom={0}
@@ -140,18 +140,18 @@ export default function LandingPage() {
             <motion.div
               variants={fadeUp}
               custom={3}
-              className="flex flex-wrap gap-4"
+              className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto px-4 sm:px-0"
             >
               <NeonButton
                 variant="secondary"
-                className="h-16 px-10 text-lg"
+                className="h-16 px-10 text-lg w-full sm:w-auto"
                 onClick={handleDownload}
               >
                 <span className="material-symbols-outlined mr-2">download</span>
-                Descargar App
+                Descargar App {latestBuild?.version && <span className="ml-1 opacity-60 text-sm font-mono">v{latestBuild.version}</span>}
               </NeonButton>
-              <Link to={ROUTES.LOGIN}>
-                <NeonButton variant="primary" className="h-16 px-10 text-lg">
+              <Link to={ROUTES.LOGIN} className="w-full sm:w-auto">
+                <NeonButton variant="primary" className="h-16 px-10 text-lg w-full sm:w-auto">
                   Empieza Gratis
                 </NeonButton>
               </Link>

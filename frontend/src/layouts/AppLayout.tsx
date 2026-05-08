@@ -115,15 +115,15 @@ export default function AppLayout() {
         {/* Mobile/Tablet header */}
         <header className="lg:hidden sticky top-0 z-30 pt-safe glass-header shrink-0">
           <div className="flex items-center justify-between px-4 sm:px-6 h-16">
-            <div className="flex items-center gap-3">
-              <div className="h-9 w-9 bg-primary rounded-xl flex items-center justify-center glow-primary">
-                <span className="material-symbols-outlined text-background-dark font-bold text-xl">
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center glow-primary">
+                <span className="material-symbols-outlined text-background-dark font-bold text-lg">
                   visibility
                 </span>
               </div>
-              <h1 className="text-xl font-bold tracking-tight">LoveArt</h1>
+              <h1 className="text-lg font-bold tracking-tight">LoveArt</h1>
               {user?.is_admin && (
-                <span className="text-[8px] font-black bg-cyan-500/20 text-cyan-400 px-1.5 py-0.5 rounded-md border border-cyan-500/30 tracking-tighter">
+                <span className="text-[7px] font-black bg-cyan-500/20 text-cyan-400 px-1.5 py-0.5 rounded-md border border-cyan-500/30 tracking-tighter">
                   ADMIN
                 </span>
               )}
@@ -173,8 +173,8 @@ export default function AppLayout() {
                     >
                       {item.icon}
                     </span>
-                    <span className="text-[9px] font-bold uppercase tracking-wider mt-0.5 relative z-10">
-                      {item.label}
+                    <span className="text-[10px] font-bold uppercase tracking-widest mt-1 relative z-10">
+                      {item.label.split(" ")[0]} 
                     </span>
                     {isActive && (
                       <motion.div

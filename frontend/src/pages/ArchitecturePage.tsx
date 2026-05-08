@@ -167,7 +167,6 @@ export default function ArchitecturePage() {
         animate={{ opacity: 1 }}
         className="grid grid-cols-1 sm:grid-cols-2 gap-2"
       >
-        {/* Blueprint Hints */}
         <div className="flex flex-wrap gap-2">
           <div className="flex items-center gap-2 text-[10px] text-slate-500 font-mono uppercase tracking-widest bg-white/2 px-2.5 py-1 rounded-md border border-white/5">
             <span className="material-symbols-outlined text-[12px] text-cyan-500/70">
@@ -175,12 +174,8 @@ export default function ArchitecturePage() {
             </span>
             <span>PLANO:</span>
             <span className="text-slate-300">PDF / JPG / PNG</span>
-            <span className="w-1 h-1 bg-white/20 rounded-full" />
-            <span className="text-slate-400">OPTIMIZADO</span>
           </div>
         </div>
-
-        {/* 3D Hints */}
         <div className="flex flex-wrap gap-2">
           <div className="flex items-center gap-2 text-[10px] text-slate-500 font-mono uppercase tracking-widest bg-white/2 px-2.5 py-1 rounded-md border border-white/5">
             <span className="material-symbols-outlined text-[12px] text-violet-500/70">
@@ -188,14 +183,12 @@ export default function ArchitecturePage() {
             </span>
             <span>Assets 3D:</span>
             <span className="text-slate-300">FBX / OBJ / GLB</span>
-            <span className="w-1 h-1 bg-white/20 rounded-full" />
-            <span className="text-slate-400">CONVERSION GLB</span>
           </div>
         </div>
       </motion.div>
 
       {/* Upload cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <UploadCard
           icon="description"
           title="Plano Técnico"
@@ -226,57 +219,8 @@ export default function ArchitecturePage() {
             <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500">
               Pipeline de Renderizado
             </h3>
-            {state.blueprintPreview && (
-              <div className="h-10 w-10 rounded-lg overflow-hidden border border-white/10">
-                <img
-                  src={state.blueprintPreview}
-                  className="w-full h-full object-cover"
-                  alt="Preview"
-                />
-              </div>
-            )}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {state.blueprintFile && (
-              <div className="flex items-center gap-4 bg-white/5 p-3 rounded-xl border border-white/5">
-                <div className="h-10 w-10 rounded-lg bg-primary/20 flex items-center justify-center shrink-0">
-                  <span className="material-symbols-outlined text-primary">
-                    description
-                  </span>
-                </div>
-                <div className="min-w-0">
-                  <p className="text-sm font-medium truncate text-slate-200">
-                    {state.blueprintFile.name}
-                  </p>
-                  <p className="text-[10px] text-slate-500 uppercase">
-                    {(state.blueprintFile.size / 1024 / 1024).toFixed(1)} MB
-                  </p>
-                </div>
-              </div>
-            )}
-            {state.model3dFile && (
-              <div className="flex items-center gap-4 bg-white/5 p-3 rounded-xl border border-white/5">
-                <div className="h-10 w-10 rounded-lg bg-secondary/20 flex items-center justify-center shrink-0">
-                  <span className="material-symbols-outlined text-secondary">
-                    deployed_code
-                  </span>
-                </div>
-                <div className="min-w-0">
-                  <p className="text-sm font-medium truncate text-slate-200">
-                    {state.model3dFile.name}
-                  </p>
-                  <p className="text-[10px] text-slate-500 uppercase">
-                    {(state.model3dFile.size / 1024 / 1024).toFixed(1)} MB
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div className="h-px bg-white/5" />
-
-          {/* Public toggle - ONLY FOR ADMINS */}
           {user?.is_admin && (
             <div className="bg-white/5 p-4 rounded-2xl border border-white/5">
               <ToggleSwitch
@@ -296,7 +240,7 @@ export default function ArchitecturePage() {
             disabled={
               !state.blueprintFile || !state.model3dFile || state.uploading
             }
-            className="h-14 text-lg"
+            className="h-12 md:h-14 text-base md:text-lg"
           >
             <span className="material-symbols-outlined">
               {state.uploading ? "data_thresholding" : "layers"}
