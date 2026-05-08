@@ -69,6 +69,11 @@ export default function AppLayout() {
             <img src={logo} alt="Logo" className="h-8 w-8" />
           </div>
           <h1 className="text-lg font-bold tracking-tight">LoveArt</h1>
+          {user?.is_admin && (
+            <span className="ml-auto mr-4 text-[9px] font-black bg-cyan-500/20 text-cyan-400 px-2 py-0.5 rounded-full border border-cyan-500/30 tracking-tighter">
+              ADMIN MODE
+            </span>
+          )}
         </div>
 
         {/* Nav links */}
@@ -117,6 +122,11 @@ export default function AppLayout() {
                 </span>
               </div>
               <h1 className="text-xl font-bold tracking-tight">LoveArt</h1>
+              {user?.is_admin && (
+                <span className="text-[8px] font-black bg-cyan-500/20 text-cyan-400 px-1.5 py-0.5 rounded-md border border-cyan-500/30 tracking-tighter">
+                  ADMIN
+                </span>
+              )}
             </div>
             <UserMenuMobile
               user={user}

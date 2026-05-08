@@ -30,8 +30,15 @@ DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
 
-# CSRF Trusted Origins for Railway
-CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS', 'http://localhost:5173').split(',')
+# CSRF Trusted Origins (Prioriza variables de entorno, con fallbacks para local y producción)
+CSRF_TRUSTED_ORIGINS = os.environ.get(
+    'CSRF_TRUSTED_ORIGINS', 
+    'http://localhost:5173,https://loveartweb.netlify.app,https://api.loveart.mircodev.com'
+).split(',')
+
+# Configuración necesaria para Nginx Reverse Proxy con SSL
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+USE_X_FORWARDED_HOST = True
 
 
 # Application definition
@@ -73,7 +80,10 @@ MIDDLEWARE = [
 # CORS CONFIGURATION
 # ============================================
 CORS_ALLOW_ALL_ORIGINS = os.environ.get('CORS_ALLOW_ALL_ORIGINS', 'True') == 'True'
-CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS', 'http://localhost:5173').split(',')
+CORS_ALLOWED_ORIGINS = os.environ.get(
+    'CORS_ALLOWED_ORIGINS', 
+    'http://localhost:5173,https://loveartweb.netlify.app,https://api.loveart.mircodev.com'
+).split(',')
 
 # ============================================
 # REST FRAMEWORK CONFIGURATION

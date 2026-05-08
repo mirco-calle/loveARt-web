@@ -55,8 +55,16 @@ class BlueprintCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Blueprint
-        fields = ['id', 'title', 'description', 'image']
+        fields = ['id', 'title', 'description', 'image', 'is_public']
         read_only_fields = ['id']
+
+    def validate_is_public(self, value):
+        """Only admins can set a blueprint as public."""
+        user = self.context['request'].user
+        # Si intenta ponerlo público pero no es admin, forzamos a False
+        if value and not getattr(user.profile, 'is_admin', False):
+            return False
+        return value
 
 
 class Model3DUploadSerializer(serializers.ModelSerializer):

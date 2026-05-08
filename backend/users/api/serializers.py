@@ -16,11 +16,15 @@ class UserProfileSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     """Serializer for reading User data, includes profile."""
     profile = UserProfileSerializer(read_only=True)
+    is_admin = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'profile']
-        read_only_fields = ['id']
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'is_admin', 'profile']
+        read_only_fields = ['id', 'is_admin']
+
+    def get_is_admin(self, obj):
+        return getattr(obj.profile, 'is_admin', False)
 
 
 class RegisterSerializer(serializers.ModelSerializer):

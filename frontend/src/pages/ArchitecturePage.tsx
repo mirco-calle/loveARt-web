@@ -12,6 +12,7 @@ import {
   getBlueprints,
   Blueprint,
 } from "../api/ArchitectureAr";
+import { useAuthStore } from "../hooks/useAuthStore";
 
 interface UploadState {
   title: string;
@@ -24,6 +25,7 @@ interface UploadState {
 }
 
 export default function ArchitecturePage() {
+  const user = useAuthStore((s) => s.user);
   const [state, setState] = useState<UploadState>({
     title: "",
     blueprintFile: null,
@@ -274,17 +276,19 @@ export default function ArchitecturePage() {
 
           <div className="h-px bg-white/5" />
 
-          {/* Public toggle */}
-          <div className="bg-white/5 p-4 rounded-2xl border border-white/5">
-            <ToggleSwitch
-              checked={state.isPublic}
-              onChange={(checked) =>
-                setState((prev) => ({ ...prev, isPublic: checked }))
-              }
-              label="Acceso Público"
-              description="Habilitar visualización para colaboradores y clientes externos."
-            />
-          </div>
+          {/* Public toggle - ONLY FOR ADMINS */}
+          {user?.is_admin && (
+            <div className="bg-white/5 p-4 rounded-2xl border border-white/5">
+              <ToggleSwitch
+                checked={state.isPublic}
+                onChange={(checked) =>
+                  setState((prev) => ({ ...prev, isPublic: checked }))
+                }
+                label="Acceso Público"
+                description="Habilitar visualización para colaboradores y clientes externos."
+              />
+            </div>
+          )}
 
           <NeonButton
             fullWidth
