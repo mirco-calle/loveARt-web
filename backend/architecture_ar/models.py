@@ -25,6 +25,20 @@ try:
 except ImportError:
     PDF_SUPPORT = False
 
+# Constantes de optimización y seguridad
+MAX_BLUEPRINT_SIZE_MB = 10
+MAX_MODEL_SIZE_MB = 100
+
+def validate_blueprint_size(value):
+    filesize = value.size
+    if filesize > MAX_BLUEPRINT_SIZE_MB * 1024 * 1024:
+        raise ValidationError(f"El plano es muy pesado ({round(filesize/1024/1024, 2)}MB). Máximo: {MAX_BLUEPRINT_SIZE_MB}MB")
+
+def validate_model_size(value):
+    filesize = value.size
+    if filesize > MAX_MODEL_SIZE_MB * 1024 * 1024:
+        raise ValidationError(f"El modelo 3D es muy pesado ({round(filesize/1024/1024, 2)}MB). Máximo: {MAX_MODEL_SIZE_MB}MB")
+
 def blueprint_upload_path(instance, filename):
     base_name = os.path.splitext(filename)[0]
     return os.path.join('architecture', str(instance.user.id), 'blueprints', f"{base_name}.jpg")
@@ -46,6 +60,7 @@ class Blueprint(models.Model):
         upload_to=blueprint_upload_path,
         validators=[
             FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'webp', 'pdf']),
+            validate_blueprint_size,
         ],
         help_text='Blueprint file (JPG, PNG, WebP, PDF). Se convertirá automáticamente a JPG optimizado.',
     )
@@ -129,6 +144,7 @@ class Model3D(models.Model):
         upload_to=model3d_upload_path,
         validators=[
             FileExtensionValidator(allowed_extensions=ALLOWED_3D_EXTENSIONS),
+            validate_model_size,
         ],
         help_text=(
             f'3D model file. Upload FBX or OBJ and we convert it automatically to GLB. '

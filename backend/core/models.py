@@ -1,16 +1,27 @@
 import os
 from django.db import models
 from django.core.validators import FileExtensionValidator
+from django.core.exceptions import ValidationError
 
 def app_build_path(instance, filename):
     return os.path.join('app_builds', filename)
+
+MAX_APK_SIZE_MB = 250
+
+def validate_apk_size(value):
+    filesize = value.size
+    if filesize > MAX_APK_SIZE_MB * 1024 * 1024:
+        raise ValidationError(f"El APK es muy pesado ({round(filesize/1024/1024, 2)}MB). Máximo: {MAX_APK_SIZE_MB}MB")
 
 class AppBuild(models.Model):
     name = models.CharField(max_length=255, default='loveARt')
     version = models.CharField(max_length=50, help_text="Ej: 1.0.0, v2.1")
     apk_file = models.FileField(
         upload_to=app_build_path,
-        validators=[FileExtensionValidator(allowed_extensions=['apk'])],
+        validators=[
+            FileExtensionValidator(allowed_extensions=['apk']),
+            validate_apk_size
+        ],
         help_text="Subir el archivo .apk generado en Unity."
     )
     description = models.TextField(blank=True, default='')

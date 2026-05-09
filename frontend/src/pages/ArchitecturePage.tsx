@@ -174,6 +174,8 @@ export default function ArchitecturePage() {
             </span>
             <span>PLANO:</span>
             <span className="text-slate-300">PDF / JPG / PNG</span>
+            <span className="w-1 h-1 bg-white/20 rounded-full mx-1" />
+            <span className="text-slate-400">MAX 10MB</span>
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -183,6 +185,8 @@ export default function ArchitecturePage() {
             </span>
             <span>Assets 3D:</span>
             <span className="text-slate-300">FBX / OBJ / GLB</span>
+            <span className="w-1 h-1 bg-white/20 rounded-full mx-1" />
+            <span className="text-slate-400">MAX 100MB</span>
           </div>
         </div>
       </motion.div>

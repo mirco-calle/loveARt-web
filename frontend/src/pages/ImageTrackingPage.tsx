@@ -267,7 +267,7 @@ export default function ImageTrackingPage() {
               {state.aspectRatio === "16:9" ? "1920x1080" : "1080x1920"}
             </span>
             <span className="w-1 h-1 bg-white/20 rounded-full" />
-            <span className="text-slate-400">MAX 1MB</span>
+            <span className="text-slate-400">MAX 2MB</span>
           </div>
         </div>
 
