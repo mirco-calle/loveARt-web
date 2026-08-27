@@ -258,23 +258,34 @@ GMAIL_REFRESH_TOKEN = os.environ.get('GMAIL_REFRESH_TOKEN', '')
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'LoveArt <noreply@loveart.app>')
 
 # ============================================
-# AWS S3 & CLOUDFRONT CONFIGURATION
+# STORAGE CONFIGURATION (Supabase Storage / S3)
 # ============================================
-AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
-AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
-AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
-AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME', 'us-east-1')
+# Supabase Storage S3-Compatible Configuration
+SUPABASE_URL = os.environ.get('SUPABASE_URL', '')
+SUPABASE_S3_ACCESS_KEY_ID = os.environ.get('SUPABASE_S3_ACCESS_KEY_ID') or os.environ.get('AWS_ACCESS_KEY_ID')
+SUPABASE_S3_SECRET_ACCESS_KEY = os.environ.get('SUPABASE_S3_SECRET_ACCESS_KEY') or os.environ.get('AWS_SECRET_ACCESS_KEY')
+SUPABASE_STORAGE_BUCKET_NAME = os.environ.get('SUPABASE_STORAGE_BUCKET_NAME') or os.environ.get('AWS_STORAGE_BUCKET_NAME')
+SUPABASE_S3_REGION_NAME = os.environ.get('SUPABASE_S3_REGION_NAME', 'us-east-1')
 
-# Dominio de CloudFront (ejemplo: d111111abcdef8.cloudfront.net)
+# Si se provee la URL de Supabase o Endpoint S3 personalizado
+AWS_S3_ENDPOINT_URL = os.environ.get('AWS_S3_ENDPOINT_URL')
+if not AWS_S3_ENDPOINT_URL and SUPABASE_URL:
+    # Auto-construir endpoint S3 de Supabase: https://<project_ref>.supabase.co/storage/v1/s3
+    AWS_S3_ENDPOINT_URL = f"{SUPABASE_URL.rstrip('/')}/storage/v1/s3"
+
+AWS_ACCESS_KEY_ID = SUPABASE_S3_ACCESS_KEY_ID
+AWS_SECRET_ACCESS_KEY = SUPABASE_S3_SECRET_ACCESS_KEY
+AWS_STORAGE_BUCKET_NAME = SUPABASE_STORAGE_BUCKET_NAME
+AWS_S3_REGION_NAME = SUPABASE_S3_REGION_NAME
 AWS_S3_CUSTOM_DOMAIN = os.environ.get('AWS_S3_CUSTOM_DOMAIN')
 
 if all([AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_STORAGE_BUCKET_NAME]):
     STORAGES = {
         "default": {
-            "BACKEND": "loveart.storages_backends.MediaStorage",
+            "BACKEND": "loveart.storages_backends.SupabaseMediaStorage",
         },
         "staticfiles": {
-            "BACKEND": "loveart.storages_backends.StaticStorage",
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
         },
     }
     
@@ -282,27 +293,17 @@ if all([AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_STORAGE_BUCKET_NAME]):
         'CacheControl': 'max-age=86400',
     }
     
-    # SigV4 is required for some regions
     AWS_S3_SIGNATURE_VERSION = 's3v4'
-    
-    # Desactivar ACLs (necesario para buckets nuevos de AWS que no permiten ACLs)
     AWS_DEFAULT_ACL = None
     AWS_QUERYSTRING_AUTH = False
     
-    # URL configurations
-    if AWS_S3_CUSTOM_DOMAIN:
-        # Si hay CloudFront, usamos ese dominio
-        STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
-        MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/uploads/'
+    if AWS_S3_ENDPOINT_URL:
+        # Modo Supabase Storage
+        print(f"✅ Storage: Usando Supabase Storage S3 (Bucket: '{AWS_STORAGE_BUCKET_NAME}')")
     else:
-        # Si no, usamos el dominio de S3 directamente
-        STATIC_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/static/'
-        MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/uploads/'
-
-    print(f"✅ Storage: Usando AWS S3 (Bucket: {AWS_STORAGE_BUCKET_NAME})")
-    if AWS_S3_CUSTOM_DOMAIN:
-        print(f"✅ CloudFront: Habilitado (Dominio: {AWS_S3_CUSTOM_DOMAIN})")
+        # Modo AWS S3
+        print(f"✅ Storage: Usando AWS S3 (Bucket: '{AWS_STORAGE_BUCKET_NAME}')")
 else:
-    print("ℹ️ Storage: Usando almacenamiento local (Faltan variables AWS en .env)")
+    print("ℹ️ Storage: Usando almacenamiento local en 'backend/uploads/' (Faltan variables SUPABASE_STORAGE_* en .env)")
 
 

@@ -30,7 +30,8 @@
 - **PostgreSQL**: Base de datos relacional para integridad de datos.
 - **JWT (SimpleJWT)**: Autenticación stateless con rotación y blacklist de tokens.
 - **Gmail API (OAuth2)**: Envío de correos corporativos de alta entrega.
-- **AWS S3 / Storage**: Almacenamiento eficiente de archivos multimedia.
+- **Azure VM + Docker**: Hospedaje del backend en contenedores aislados.
+- **Supabase (PostgreSQL)**: Base de datos gestionada en la nube.
 
 ---
 
@@ -41,8 +42,8 @@ Este proyecto está completamente dockerizado para facilitar su despliegue y des
 ### 1. Clonar el repositorio
 
 ```bash
-git clone https://github.com/tu-usuario/loveart-desktop.git
-cd loveart-desktop
+git clone https://github.com/mirco-calle/loveARt-web.git loveart
+cd loveart
 ```
 
 ### 2. Configurar variables de entorno
@@ -52,7 +53,11 @@ Crea un archivo `.env` en la raíz basado en el ejemplo proporcionado y completa
 ### 3. Levantar el proyecto
 
 ```bash
-docker-compose up --build
+# Desarrollo local
+docker compose up --build
+
+# Producción (Azure VM)
+docker compose -f docker-compose.prod.yml up -d --build
 ```
 
 - **Frontend**: http://localhost:5173

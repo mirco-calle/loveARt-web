@@ -33,6 +33,8 @@ pnpm-debug.log*
 .venv/
 venv/
 env/
+*.env
+*.env.*
 
 # Django / local media and db
 backend/uploads/
