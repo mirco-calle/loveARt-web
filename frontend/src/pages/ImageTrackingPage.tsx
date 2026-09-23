@@ -240,7 +240,7 @@ export default function ImageTrackingPage() {
             <span className="material-symbols-outlined text-base leading-none">
               facebook
             </span>
-            <span className="text-xs font-bold tracking-tight">FB</span>
+            <span className="text-xs font-bold tracking-tight">Facebook</span>
           </button>
         </div>
       </motion.div>
@@ -259,7 +259,13 @@ export default function ImageTrackingPage() {
             </span>
             <span>IMG:</span>
             <span className="text-slate-300">
-              {state.aspectRatio === "16:9" ? "1920x1080" : "1080x1920"}
+              {state.aspectRatio === "16:9"
+                ? "1920x1080"
+                : state.aspectRatio === "9:16"
+                  ? "1080x1920"
+                  : state.aspectRatio === "1:1"
+                    ? "1080x1080"
+                    : "940x788"}
             </span>
             <span className="w-1 h-1 bg-white/20 rounded-full" />
             <span className="text-slate-400">MAX 2MB</span>
@@ -273,15 +279,30 @@ export default function ImageTrackingPage() {
               movie
             </span>
             <span>VIDEO:</span>
-            <span className="text-slate-300">MP4 / H.264</span>
+            <span className="text-slate-300">
+              {state.aspectRatio === "16:9"
+                ? "16:9 MP4"
+                : state.aspectRatio === "9:16"
+                  ? "9:16 MP4"
+                  : state.aspectRatio === "1:1"
+                    ? "1:1 MP4"
+                    : "940:788 MP4"}
+            </span>
             <span className="w-1 h-1 bg-white/20 rounded-full" />
             <span className="text-slate-400">MAX 40MB</span>
           </div>
         </div>
       </motion.div>
 
-      {/* Upload cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-8">
+      {/* Upload cards - Dynamic aspect ratio */}
+      <div
+        className={`grid gap-6 md:gap-8 transition-all duration-500 w-full ${state.aspectRatio === "9:16"
+          ? "grid-cols-1 sm:grid-cols-2 max-w-2xl mx-auto"
+          : state.aspectRatio === "1:1"
+            ? "grid-cols-1 sm:grid-cols-2 max-w-3xl mx-auto"
+            : "grid-cols-1 sm:grid-cols-2"
+          }`}
+      >
         <UploadCard
           icon="image"
           title="Imagen de Seguimiento"
@@ -290,6 +311,7 @@ export default function ImageTrackingPage() {
           onFileSelect={handleImageSelect}
           disabled={state.uploading}
           previewUrl={state.imagePreview}
+          aspectRatio={state.aspectRatio}
         />
 
         <UploadCard
@@ -301,6 +323,7 @@ export default function ImageTrackingPage() {
           disabled={state.uploading}
           previewUrl={state.videoPreview}
           isVideoPreview
+          aspectRatio={state.aspectRatio}
         />
       </div>
 
