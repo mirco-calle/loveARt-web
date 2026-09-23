@@ -93,10 +93,10 @@ export default function PricingSection() {
       name: "Studio",
       price: "Bs 199",
       description:
-        "Perfecto para estudios de arquitectura y marketing que necesitan recurrencia.",
+        "Perfecto para agencias creativas y marketing que necesitan recurrencia.",
       features: [
         "Vision Engine Ilimitado",
-        "5 Proyectos BluePrint 3D activos",
+        "Proyectos AR Target ilimitados",
         "Hasta 5 Usuarios",
         "Sin marca de agua",
         "Soporte por Email (48h)",

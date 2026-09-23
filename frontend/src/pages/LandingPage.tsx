@@ -16,15 +16,15 @@ const ENGINES = [
     title: "Vision Engine",
     subtitle: "Imagen a Video",
     description:
-      "Transforma fotografías en experiencias cinematográficas. El contenido cobra vida al ser escaneado con la App.",
+      "Transforma fotografías en experiencias cinematográficas. El contenido cobra vida al ser escaneado con la App mediante Realidad Aumentada.",
     color: "primary",
   },
   {
-    icon: "architecture",
-    title: "BluePrint 3D",
-    subtitle: "Plano a Volumen",
+    icon: "animation",
+    title: "Vuforia Tracking Core",
+    subtitle: "Reconocimiento y Reproducción",
     description:
-      "Eleva planos 2D a maquetas 3D interactivas. Ideal para preventa inmobiliaria y visualización de espacios.",
+      "Seguimiento visual instantáneo de imágenes target con reproducción fluida de video interactivo optimizado para dispositivos móviles.",
     color: "secondary",
   },
 ];
@@ -132,9 +132,8 @@ export default function LandingPage() {
               custom={2}
               className="text-slate-400 text-lg sm:text-xl max-w-xl mb-12 leading-relaxed"
             >
-              La plataforma Studio definitiva para arquitectos y
-              desarrolladores. Transforme planos en maquetas 3D y fotos en
-              videos vivos en segundos.
+              La plataforma Studio definitiva para creadores y marcas. Transforme imágenes
+              target en videos interactivos con Realidad Aumentada en segundos.
             </motion.p>
 
             <motion.div
@@ -308,8 +307,7 @@ export default function LandingPage() {
               </span>
             </div>
             <p className="text-slate-500 text-sm max-w-xs text-center md:text-left">
-              Plataforma Studio líder en Realidad Aumentada para Arquitectura y
-              Marketing.
+              Plataforma Studio líder en Realidad Aumentada para Imagen y Video.
             </p>
           </div>
 

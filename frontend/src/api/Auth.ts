@@ -18,10 +18,13 @@ export interface User {
 }
 
 export interface AuthResponse {
-  access: string;
-  refresh: string;
-  user: User;
+  access?: string;
+  refresh?: string;
+  user?: User;
   created?: boolean;
+  requires_2fa?: boolean;
+  email?: string;
+  detail?: string;
 }
 
 /** Register a new user */

@@ -10,7 +10,6 @@ import logo from "../assets/logo.png";
 const NAV_ITEMS = [
   { to: ROUTES.HOME, icon: "dashboard", label: "Home Studio" },
   { to: ROUTES.UPLOAD_TRACKING, icon: "add_box", label: "Image AR" },
-  { to: ROUTES.UPLOAD_ARCHITECTURE, icon: "view_in_ar", label: "Arquitectura" },
   { to: ROUTES.LIBRARY, icon: "grid_view", label: "Biblioteca" },
 ];
 

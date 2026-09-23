@@ -141,8 +141,7 @@ export default function ImageTrackingPage() {
           Image AR Studio
         </h2>
         <p className="text-sm sm:text-base text-slate-400 mt-2 max-w-xl leading-relaxed">
-          Sube una foto y un video. Al escanear la foto en la vida real, el
-          video cobrará vida magnéticamente.
+          Sube una imagen y un video. Al escanear la imagen con el App, la imagen cobrará vida interactivamente.
         </p>
       </motion.div>
 
@@ -185,11 +184,10 @@ export default function ImageTrackingPage() {
             onClick={() =>
               setState((prev) => ({ ...prev, aspectRatio: "16:9" }))
             }
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all duration-300 ${
-              state.aspectRatio === "16:9"
-                ? "bg-cyan-500/10 border-cyan-500/40 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
-                : "bg-white/2 border-white/5 text-slate-500 hover:bg-white/5"
-            }`}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all duration-300 ${state.aspectRatio === "16:9"
+              ? "bg-cyan-500/10 border-cyan-500/40 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
+              : "bg-white/2 border-white/5 text-slate-500 hover:bg-white/5"
+              }`}
           >
             <span className="material-symbols-outlined text-base leading-none">
               rectangle
@@ -202,11 +200,10 @@ export default function ImageTrackingPage() {
             onClick={() =>
               setState((prev) => ({ ...prev, aspectRatio: "9:16" }))
             }
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all duration-300 ${
-              state.aspectRatio === "9:16"
-                ? "bg-cyan-500/10 border-cyan-500/40 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
-                : "bg-white/2 border-white/5 text-slate-500 hover:bg-white/5"
-            }`}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all duration-300 ${state.aspectRatio === "9:16"
+              ? "bg-cyan-500/10 border-cyan-500/40 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
+              : "bg-white/2 border-white/5 text-slate-500 hover:bg-white/5"
+              }`}
           >
             <span className="material-symbols-outlined text-base leading-none rotate-90">
               rectangle
@@ -219,11 +216,10 @@ export default function ImageTrackingPage() {
             onClick={() =>
               setState((prev) => ({ ...prev, aspectRatio: "1:1" }))
             }
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all duration-300 ${
-              state.aspectRatio === "1:1"
-                ? "bg-cyan-500/10 border-cyan-500/40 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
-                : "bg-white/2 border-white/5 text-slate-500 hover:bg-white/5"
-            }`}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all duration-300 ${state.aspectRatio === "1:1"
+              ? "bg-cyan-500/10 border-cyan-500/40 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
+              : "bg-white/2 border-white/5 text-slate-500 hover:bg-white/5"
+              }`}
           >
             <span className="material-symbols-outlined text-base leading-none">
               square
@@ -236,11 +232,10 @@ export default function ImageTrackingPage() {
             onClick={() =>
               setState((prev) => ({ ...prev, aspectRatio: "940:788" }))
             }
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all duration-300 ${
-              state.aspectRatio === "940:788"
-                ? "bg-cyan-500/10 border-cyan-500/40 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
-                : "bg-white/2 border-white/5 text-slate-500 hover:bg-white/5"
-            }`}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all duration-300 ${state.aspectRatio === "940:788"
+              ? "bg-cyan-500/10 border-cyan-500/40 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
+              : "bg-white/2 border-white/5 text-slate-500 hover:bg-white/5"
+              }`}
           >
             <span className="material-symbols-outlined text-base leading-none">
               facebook

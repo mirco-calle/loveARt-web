@@ -7,7 +7,6 @@ import LandingPage from "../pages/LandingPage";
 import LoginPage from "../pages/LoginPage";
 import Home from "../pages/Home";
 import ImageTrackingPage from "../pages/ImageTrackingPage";
-import ArchitecturePage from "../pages/ArchitecturePage";
 import MyLibraryPage from "../pages/MyLibraryPage";
 
 // Layouts
@@ -43,10 +42,6 @@ export default function Navigation() {
           <Route
             path={ROUTES.UPLOAD_TRACKING}
             element={<ImageTrackingPage />}
-          />
-          <Route
-            path={ROUTES.UPLOAD_ARCHITECTURE}
-            element={<ArchitecturePage />}
           />
           <Route path={ROUTES.LIBRARY} element={<MyLibraryPage />} />
         </Route>

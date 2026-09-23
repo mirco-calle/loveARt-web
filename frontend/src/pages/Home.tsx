@@ -9,9 +9,9 @@ const ENGINES = [
   {
     id: "ar-photo",
     badge: "Spatial Engine v2.4",
-    title: "AR Photo to Video",
+    title: "AR Imagen a Video",
     description:
-      "Transforme imágenes estáticas en videos espaciales 3D inmersivos utilizando nuestra estimación de profundidad de IA patentada.",
+      "Transforme imágenes estáticas en experiencias de Realidad Aumentada con videos inmersivos.",
     icon: "animation",
     bgIcon: "photo_camera",
     route: ROUTES.UPLOAD_TRACKING,
@@ -19,29 +19,11 @@ const ENGINES = [
     glowRgb: "139,92,246",
     buttonVariant: "primary" as const,
   },
-  {
-    id: "ar-blueprint",
-    badge: "CAD Optimizer Pro",
-    title: "AR Blueprint to 3D",
-    description:
-      "Convierta planos arquitectónicos 2D en modelos AR interactivos con iluminación basada en física.",
-    icon: "view_in_ar",
-    bgIcon: "architecture",
-    route: ROUTES.UPLOAD_ARCHITECTURE,
-    accentColor: "#06b6d4", // cyan
-    glowRgb: "6,182,212",
-    buttonVariant: "secondary" as const,
-  },
 ] as const;
 
 const RECENT_ITEMS = [
-  { icon: "image", name: "Penthouse_View.ar", time: "Edited 2h ago" },
-  { icon: "videocam", name: "Urban_Scan_04.mov", time: "Rendered 5h ago" },
-  {
-    icon: "model_training",
-    name: "Floor_Plan_B.blueprint",
-    time: "Uploaded 12h ago",
-  },
+  { icon: "image", name: "Target_Artwork_01.jpg", time: "Edited 2h ago" },
+  { icon: "videocam", name: "Cinema_Experience.mp4", time: "Rendered 5h ago" },
 ] as const;
 
 // ─── Engine card ──────────────────────────────────────────────────────────────
@@ -134,7 +116,7 @@ function EngineCard({ engine, onLaunch }: EngineCardProps) {
             onClick={onLaunch}
             className="w-full sm:w-auto"
           >
-            Launch Studio
+            ingresar Studio
             <span className="material-symbols-outlined text-base">
               arrow_forward
             </span>
@@ -180,7 +162,7 @@ export default function Home() {
     user?.first_name?.trim() ||
     (user?.username
       ? user.username.split(".")[0].charAt(0).toUpperCase() +
-        user.username.split(".")[0].slice(1)
+      user.username.split(".")[0].slice(1)
       : "") ||
     "Creator";
 
@@ -215,7 +197,7 @@ export default function Home() {
       </header>
 
       {/* Engine cards */}
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-12">
+      <section className="grid grid-cols-1 max-w-2xl gap-6 md:gap-8 mb-12">
         {ENGINES.map((engine) => (
           <EngineCard
             key={engine.id}

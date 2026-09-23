@@ -4,7 +4,7 @@ import { formatBytes } from "../../utils/formatters";
 interface AssetLibraryItemProps {
   title: string;
   thumbnailUrl?: string;
-  type: "tracking" | "architecture";
+  type?: "tracking";
   aspectRatio?: string;
   fileSize?: number;
   width?: number;
@@ -13,7 +13,6 @@ interface AssetLibraryItemProps {
   createdAt: string;
   isPublic: boolean;
   videoSize?: number;
-  model3dSize?: number;
   onOptions?: () => void;
   onDelete?: () => void;
 }
@@ -21,7 +20,6 @@ interface AssetLibraryItemProps {
 export default function AssetLibraryItem({
   title,
   thumbnailUrl,
-  type,
   aspectRatio,
   fileSize,
   width,
@@ -30,7 +28,6 @@ export default function AssetLibraryItem({
   createdAt,
   isPublic,
   videoSize,
-  model3dSize,
   onOptions,
   onDelete,
 }: AssetLibraryItemProps) {
@@ -49,16 +46,14 @@ export default function AssetLibraryItem({
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-slate-600">
-            <span className="material-symbols-outlined text-3xl">
-              {type === "tracking" ? "image" : "deployed_code"}
-            </span>
+            <span className="material-symbols-outlined text-3xl">image</span>
           </div>
         )}
 
         {/* Type Icon Badge */}
         <div className="absolute top-2 left-2 p-1 bg-black/40 backdrop-blur-md rounded-lg border border-white/10">
           <span className="material-symbols-outlined text-xs text-secondary leading-none">
-            {type === "tracking" ? "image" : "architecture"}
+            image
           </span>
         </div>
       </div>
@@ -147,18 +142,14 @@ export default function AssetLibraryItem({
             </span>
           </div>
 
-          {/* Linked Asset (Video or 3D Model) */}
-          {(videoSize || model3dSize) && (
+          {/* Linked Video Asset */}
+          {videoSize && (
             <div className="flex items-center gap-1.5 px-2 py-0.5 bg-primary/10 rounded-full border border-primary/20">
               <span className="material-symbols-outlined text-[14px] text-primary">
-                {type === "tracking" ? "movie" : "deployed_code"}
+                movie
               </span>
               <span className="text-[10px] text-primary font-bold font-mono">
-                {videoSize
-                  ? formatBytes(videoSize)
-                  : model3dSize
-                    ? formatBytes(model3dSize)
-                    : "---"}
+                {formatBytes(videoSize)}
               </span>
             </div>
           )}

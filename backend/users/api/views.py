@@ -10,6 +10,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 
 import requests
+from datetime import timedelta
+from django.utils import timezone
 
 from users.api.serializers import (
     RegisterSerializer,
@@ -174,10 +176,11 @@ def verify_email_view(request):
     user.is_active = True
     user.save()
 
-    # Mark profile email as verified
+    # Mark profile email as verified and update verification timestamp
     profile, _ = UserProfile.objects.get_or_create(user=user)
     profile.email_verified = True
-    profile.save(update_fields=['email_verified'])
+    profile.last_login_verified_at = timezone.now()
+    profile.save(update_fields=['email_verified', 'last_login_verified_at'])
 
     otp.delete()
 
@@ -210,7 +213,9 @@ def resend_verification_view(request):
             status=status.HTTP_404_NOT_FOUND,
         )
 
-    if user.is_active:
+    # Permitir reenvío si la cuenta está inactiva O si tiene un código pendiente (ej. 2FA)
+    has_pending_otp = EmailVerificationCode.objects.filter(user=user).exists()
+    if user.is_active and not has_pending_otp:
         return Response(
             {'detail': 'This account is already verified.'},
             status=status.HTTP_400_BAD_REQUEST,
@@ -398,8 +403,26 @@ def google_login_view(request):
         if updated:
             user.save()
 
-    if created:
-        UserProfile.objects.get_or_create(user=user)
+    profile, _ = UserProfile.objects.get_or_create(user=user)
+
+    # ── Check if 2FA verification is required (> 30 days or never verified) ──
+    DAYS_THRESHOLD = 30
+    now = timezone.now()
+    needs_2fa = False
+
+    if not profile.last_login_verified_at:
+        needs_2fa = True
+    elif (now - profile.last_login_verified_at) > timedelta(days=DAYS_THRESHOLD):
+        needs_2fa = True
+
+    if needs_2fa:
+        otp_code = create_and_send_otp(user)
+        print(f'[GOOGLE 2FA OTP] Verification code for {user.email}: {otp_code}')
+        return Response({
+            'requires_2fa': True,
+            'email': user.email,
+            'detail': 'Se ha enviado un código de verificación a tu correo de Gmail.',
+        }, status=status.HTTP_200_OK)
 
     tokens = get_tokens_for_user(user)
     return Response({

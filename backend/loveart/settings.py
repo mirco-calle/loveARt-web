@@ -59,7 +59,6 @@ INSTALLED_APPS = [
     'django_cleanup.apps.CleanupConfig',
     # Apps del proyecto
     'image_tracking',
-    'architecture_ar',
     'users',
     'core',
 ]

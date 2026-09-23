@@ -272,13 +272,20 @@ export default function LoginPage() {
   const { loginWithGoogle, isLoading } = useAuthStore();
   const [view, setView] = useState<AuthView>("selector");
   const [pendingEmail, setPendingEmail] = useState("");
-  const [verifySource, setVerifySource] = useState<"register" | "login">(
+  const [verifySource, setVerifySource] = useState<"register" | "login" | "selector">(
     "register",
   );
 
   const handleGoogleSuccess = async (access_token: string) => {
     try {
-      await loginWithGoogle({ access_token });
+      const res = await loginWithGoogle({ access_token });
+      if (res?.requires_2fa) {
+        setPendingEmail(res.email || "");
+        setVerifySource("selector");
+        setView("verify");
+        toast.info("Ingresa el código de seguridad enviado a tu Gmail.");
+        return;
+      }
       toast.success("¡Bienvenido, artista!");
       navigate(ROUTES.HOME);
     } catch {
@@ -342,9 +349,7 @@ export default function LoginPage() {
             <VerifyEmailForm
               key="verify"
               email={pendingEmail}
-              onBack={() =>
-                setView(verifySource === "login" ? "login" : "register")
-              }
+              onBack={() => setView(verifySource)}
             />
           )}
 

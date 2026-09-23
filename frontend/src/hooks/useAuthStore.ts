@@ -15,7 +15,7 @@ interface AuthState {
   loginWithGoogle: (payload: {
     credential?: string;
     access_token?: string;
-  }) => Promise<void>;
+  }) => Promise<{ requires_2fa: boolean; email?: string }>;
   logout: () => Promise<void>;
   fetchUser: () => Promise<void>;
   setSession: (user: User, access: string, refresh: string) => void;
@@ -80,13 +80,20 @@ export const useAuthStore = create<AuthState>()(
         set({ isLoading: true });
         try {
           const { data } = await googleLogin(payload);
-          set({
-            user: data.user,
-            access_token: data.access,
-            refresh_token: data.refresh,
-            isAuthenticated: true,
-            isLoading: false,
-          });
+          if (data.requires_2fa) {
+            set({ isLoading: false });
+            return { requires_2fa: true, email: data.email || "" };
+          }
+          if (data.user && data.access && data.refresh) {
+            set({
+              user: data.user,
+              access_token: data.access,
+              refresh_token: data.refresh,
+              isAuthenticated: true,
+              isLoading: false,
+            });
+          }
+          return { requires_2fa: false, email: "" };
         } catch {
           set({ isLoading: false });
           throw new Error("Error logic with Google");

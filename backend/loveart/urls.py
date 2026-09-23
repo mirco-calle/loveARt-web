@@ -26,7 +26,6 @@ def api_root(request):
         'endpoints': {
             'users': '/api/users/',
             'tracking': '/api/tracking/',
-            'architecture': '/api/architecture/',
             'core': '/api/core/',
             'docs': '/api/docs/',
             'schema': '/api/schema/',
@@ -45,7 +44,6 @@ urlpatterns = [
     # API endpoints
     path('api/users/', include('users.api.routes')),
     path('api/tracking/', include('image_tracking.api.router')),
-    path('api/architecture/', include('architecture_ar.api.router')),
     path('api/core/', include('core.api.router')),
     path('api/v1/public-catalog/', views.global_public_catalog, name='public-catalog'),
 
