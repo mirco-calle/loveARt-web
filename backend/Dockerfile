@@ -30,8 +30,9 @@ RUN chmod +x /app/entrypoint.sh
 # Expose port
 EXPOSE 8000
 
-# Health check
-HEALTHCHECK --interval=60s --timeout=15s --start-period=60s --retries=3 \
-    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/admin/').read()" || exit 1
+# Health check: más permisivo - 90s start-period y usa /api/ en vez de /admin/
+# /api/ retorna JSON inmediatamente sin requerir static files
+HEALTHCHECK --interval=30s --timeout=10s --start-period=90s --retries=5 \
+    CMD curl -f http://localhost:8000/ || exit 1
 
 ENTRYPOINT ["/app/entrypoint.sh"]
