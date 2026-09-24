@@ -56,13 +56,15 @@ export default function ImageTrackingPage() {
 
   // Límites sincronizados con el backend
   const MAX_IMAGE_SIZE_MB = 2;
-  const MAX_VIDEO_SIZE_MB = 70;
+  const MAX_VIDEO_SIZE_MB = 50;
 
   const handleImageSelect = useCallback((file: File) => {
     const sizeMb = file.size / (1024 * 1024);
     if (sizeMb > MAX_IMAGE_SIZE_MB) {
       toast.error(
-        `La imagen pesa ${sizeMb.toFixed(1)} MB. El límite máximo es ${MAX_IMAGE_SIZE_MB} MB.`
+        `La imagen pesa ${sizeMb.toFixed(
+          1
+        )} MB. El límite máximo es ${MAX_IMAGE_SIZE_MB} MB.`
       );
       return;
     }
@@ -81,7 +83,9 @@ export default function ImageTrackingPage() {
     const sizeMb = file.size / (1024 * 1024);
     if (sizeMb > MAX_VIDEO_SIZE_MB) {
       toast.error(
-        `El video pesa ${sizeMb.toFixed(1)} MB. El límite máximo es ${MAX_VIDEO_SIZE_MB} MB.`
+        `El video pesa ${sizeMb.toFixed(
+          1
+        )} MB. El límite máximo es ${MAX_VIDEO_SIZE_MB} MB.`
       );
       return;
     }
@@ -105,7 +109,11 @@ export default function ImageTrackingPage() {
 
     const videoMb = state.videoFile.size / (1024 * 1024);
     if (videoMb > MAX_VIDEO_SIZE_MB) {
-      toast.error(`El video supera los ${MAX_VIDEO_SIZE_MB} MB permitidos (${videoMb.toFixed(1)} MB).`);
+      toast.error(
+        `El video supera los ${MAX_VIDEO_SIZE_MB} MB permitidos (${videoMb.toFixed(
+          1
+        )} MB).`
+      );
       return;
     }
 
@@ -173,7 +181,8 @@ export default function ImageTrackingPage() {
           Image AR Studio
         </h2>
         <p className="text-sm sm:text-base text-slate-400 mt-2 max-w-xl leading-relaxed">
-          Sube una imagen y un video. Al escanear la imagen con el App, la imagen cobrará vida interactivamente.
+          Sube una imagen y un video. Al escanear la imagen con el App, la
+          imagen cobrará vida interactivamente.
         </p>
       </motion.div>
 
@@ -216,10 +225,11 @@ export default function ImageTrackingPage() {
             onClick={() =>
               setState((prev) => ({ ...prev, aspectRatio: "16:9" }))
             }
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all duration-300 ${state.aspectRatio === "16:9"
-              ? "bg-cyan-500/10 border-cyan-500/40 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
-              : "bg-white/2 border-white/5 text-slate-500 hover:bg-white/5"
-              }`}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all duration-300 ${
+              state.aspectRatio === "16:9"
+                ? "bg-cyan-500/10 border-cyan-500/40 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
+                : "bg-white/2 border-white/5 text-slate-500 hover:bg-white/5"
+            }`}
           >
             <span className="material-symbols-outlined text-base leading-none">
               rectangle
@@ -232,10 +242,11 @@ export default function ImageTrackingPage() {
             onClick={() =>
               setState((prev) => ({ ...prev, aspectRatio: "9:16" }))
             }
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all duration-300 ${state.aspectRatio === "9:16"
-              ? "bg-cyan-500/10 border-cyan-500/40 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
-              : "bg-white/2 border-white/5 text-slate-500 hover:bg-white/5"
-              }`}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all duration-300 ${
+              state.aspectRatio === "9:16"
+                ? "bg-cyan-500/10 border-cyan-500/40 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
+                : "bg-white/2 border-white/5 text-slate-500 hover:bg-white/5"
+            }`}
           >
             <span className="material-symbols-outlined text-base leading-none rotate-90">
               rectangle
@@ -248,10 +259,11 @@ export default function ImageTrackingPage() {
             onClick={() =>
               setState((prev) => ({ ...prev, aspectRatio: "1:1" }))
             }
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all duration-300 ${state.aspectRatio === "1:1"
-              ? "bg-cyan-500/10 border-cyan-500/40 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
-              : "bg-white/2 border-white/5 text-slate-500 hover:bg-white/5"
-              }`}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all duration-300 ${
+              state.aspectRatio === "1:1"
+                ? "bg-cyan-500/10 border-cyan-500/40 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
+                : "bg-white/2 border-white/5 text-slate-500 hover:bg-white/5"
+            }`}
           >
             <span className="material-symbols-outlined text-base leading-none">
               square
@@ -264,15 +276,18 @@ export default function ImageTrackingPage() {
             onClick={() =>
               setState((prev) => ({ ...prev, aspectRatio: "4:3" }))
             }
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all duration-300 ${state.aspectRatio === "4:3"
-              ? "bg-cyan-500/10 border-cyan-500/40 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
-              : "bg-white/2 border-white/5 text-slate-500 hover:bg-white/5"
-              }`}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all duration-300 ${
+              state.aspectRatio === "4:3"
+                ? "bg-cyan-500/10 border-cyan-500/40 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
+                : "bg-white/2 border-white/5 text-slate-500 hover:bg-white/5"
+            }`}
           >
             <span className="material-symbols-outlined text-base leading-none">
               crop_landscape
             </span>
-            <span className="text-xs font-bold tracking-tight">4:3 Portarretrato</span>
+            <span className="text-xs font-bold tracking-tight">
+              4:3 Portarretrato
+            </span>
           </button>
 
           <button
@@ -280,10 +295,11 @@ export default function ImageTrackingPage() {
             onClick={() =>
               setState((prev) => ({ ...prev, aspectRatio: "940:788" }))
             }
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all duration-300 ${state.aspectRatio === "940:788"
-              ? "bg-cyan-500/10 border-cyan-500/40 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
-              : "bg-white/2 border-white/5 text-slate-500 hover:bg-white/5"
-              }`}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all duration-300 ${
+              state.aspectRatio === "940:788"
+                ? "bg-cyan-500/10 border-cyan-500/40 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
+                : "bg-white/2 border-white/5 text-slate-500 hover:bg-white/5"
+            }`}
           >
             <span className="material-symbols-outlined text-base leading-none">
               facebook
@@ -310,12 +326,12 @@ export default function ImageTrackingPage() {
               {state.aspectRatio === "16:9"
                 ? "1920x1080"
                 : state.aspectRatio === "9:16"
-                  ? "1080x1920"
-                  : state.aspectRatio === "1:1"
-                    ? "1080x1080"
-                    : state.aspectRatio === "4:3"
-                      ? "1440x1080 (4:3)"
-                      : "940x788"}
+                ? "1080x1920"
+                : state.aspectRatio === "1:1"
+                ? "1080x1080"
+                : state.aspectRatio === "4:3"
+                ? "1440x1080 (4:3)"
+                : "940x788"}
             </span>
             <span className="w-1 h-1 bg-white/20 rounded-full" />
             <span className="text-slate-400">MAX 2MB</span>
@@ -333,27 +349,28 @@ export default function ImageTrackingPage() {
               {state.aspectRatio === "16:9"
                 ? "16:9 MP4"
                 : state.aspectRatio === "9:16"
-                  ? "9:16 MP4"
-                  : state.aspectRatio === "1:1"
-                    ? "1:1 MP4"
-                    : state.aspectRatio === "4:3"
-                      ? "4:3 MP4"
-                      : "940:788 MP4"}
+                ? "9:16 MP4"
+                : state.aspectRatio === "1:1"
+                ? "1:1 MP4"
+                : state.aspectRatio === "4:3"
+                ? "4:3 MP4"
+                : "940:788 MP4"}
             </span>
             <span className="w-1 h-1 bg-white/20 rounded-full" />
-            <span className="text-slate-400">MAX 70MB</span>
+            <span className="text-slate-400">MAX 50MB</span>
           </div>
         </div>
       </motion.div>
 
       {/* Upload cards - Dynamic aspect ratio */}
       <div
-        className={`grid gap-6 md:gap-8 transition-all duration-500 w-full ${state.aspectRatio === "9:16"
-          ? "grid-cols-1 sm:grid-cols-2 max-w-2xl mx-auto"
-          : state.aspectRatio === "1:1"
+        className={`grid gap-6 md:gap-8 transition-all duration-500 w-full ${
+          state.aspectRatio === "9:16"
+            ? "grid-cols-1 sm:grid-cols-2 max-w-2xl mx-auto"
+            : state.aspectRatio === "1:1"
             ? "grid-cols-1 sm:grid-cols-2 max-w-3xl mx-auto"
             : "grid-cols-1 sm:grid-cols-2"
-          }`}
+        }`}
       >
         <UploadCard
           icon="image"
@@ -434,7 +451,8 @@ export default function ImageTrackingPage() {
                     >
                       {(state.imageFile.size / 1024 / 1024).toFixed(1)} MB
                     </p>
-                    {state.imageFile.size / (1024 * 1024) > MAX_IMAGE_SIZE_MB && (
+                    {state.imageFile.size / (1024 * 1024) >
+                      MAX_IMAGE_SIZE_MB && (
                       <span className="text-[10px] text-red-400 font-bold bg-red-500/20 px-1.5 py-0.5 rounded">
                         Máx {MAX_IMAGE_SIZE_MB}MB
                       </span>
@@ -474,7 +492,8 @@ export default function ImageTrackingPage() {
                     >
                       {(state.videoFile.size / 1024 / 1024).toFixed(1)} MB
                     </p>
-                    {state.videoFile.size / (1024 * 1024) > MAX_VIDEO_SIZE_MB && (
+                    {state.videoFile.size / (1024 * 1024) >
+                      MAX_VIDEO_SIZE_MB && (
                       <span className="text-[10px] text-red-400 font-bold bg-red-500/20 px-1.5 py-0.5 rounded">
                         Máx {MAX_VIDEO_SIZE_MB}MB
                       </span>
@@ -502,16 +521,31 @@ export default function ImageTrackingPage() {
           )}
 
           {/* Alerta si algún archivo excede el tamaño */}
-          {((state.imageFile && state.imageFile.size / (1024 * 1024) > MAX_IMAGE_SIZE_MB) ||
-            (state.videoFile && state.videoFile.size / (1024 * 1024) > MAX_VIDEO_SIZE_MB)) && (
+          {((state.imageFile &&
+            state.imageFile.size / (1024 * 1024) > MAX_IMAGE_SIZE_MB) ||
+            (state.videoFile &&
+              state.videoFile.size / (1024 * 1024) > MAX_VIDEO_SIZE_MB)) && (
             <div className="flex items-center gap-3 p-3.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-xs">
               <span className="material-symbols-outlined text-red-400 shrink-0">
                 warning
               </span>
               <span>
-                {state.videoFile && state.videoFile.size / (1024 * 1024) > MAX_VIDEO_SIZE_MB
-                  ? `El video pesa ${(state.videoFile.size / 1024 / 1024).toFixed(1)} MB. Debes comprimirlo o elegir uno menor a ${MAX_VIDEO_SIZE_MB} MB antes de subir.`
-                  : `La imagen pesa ${(state.imageFile!.size / 1024 / 1024).toFixed(1)} MB. El límite máximo es ${MAX_IMAGE_SIZE_MB} MB.`}
+                {state.videoFile &&
+                state.videoFile.size / (1024 * 1024) > MAX_VIDEO_SIZE_MB
+                  ? `El video pesa ${(
+                      state.videoFile.size /
+                      1024 /
+                      1024
+                    ).toFixed(
+                      1
+                    )} MB. Debes comprimirlo o elegir uno menor a ${MAX_VIDEO_SIZE_MB} MB antes de subir.`
+                  : `La imagen pesa ${(
+                      state.imageFile!.size /
+                      1024 /
+                      1024
+                    ).toFixed(
+                      1
+                    )} MB. El límite máximo es ${MAX_IMAGE_SIZE_MB} MB.`}
               </span>
             </div>
           )}
@@ -533,9 +567,11 @@ export default function ImageTrackingPage() {
             </span>
             {state.uploading
               ? `Subiendo ${state.progress}%`
-              : state.videoFile && state.videoFile.size / (1024 * 1024) > MAX_VIDEO_SIZE_MB
+              : state.videoFile &&
+                state.videoFile.size / (1024 * 1024) > MAX_VIDEO_SIZE_MB
               ? `Video Excede ${MAX_VIDEO_SIZE_MB}MB`
-              : state.imageFile && state.imageFile.size / (1024 * 1024) > MAX_IMAGE_SIZE_MB
+              : state.imageFile &&
+                state.imageFile.size / (1024 * 1024) > MAX_IMAGE_SIZE_MB
               ? `Imagen Excede ${MAX_IMAGE_SIZE_MB}MB`
               : "Lanzar Proyecto AR"}
           </NeonButton>
@@ -586,7 +622,9 @@ export default function ImageTrackingPage() {
                 key={project.id}
                 filename={project.title}
                 thumbnailUrl={project.image_url}
-                meta={`${project.aspect_ratio} • ${project.is_public ? "🌐 Cloud" : "🔒 Private"} • ${new Date(project.created_at).toLocaleDateString()}`}
+                meta={`${project.aspect_ratio} • ${
+                  project.is_public ? "🌐 Cloud" : "🔒 Private"
+                } • ${new Date(project.created_at).toLocaleDateString()}`}
               />
             ))
           )}
