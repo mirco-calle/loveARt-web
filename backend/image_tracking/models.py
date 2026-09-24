@@ -34,6 +34,7 @@ def validate_aspect_ratio(instance, value):
         '16:9': 16 / 9,
         '9:16': 9 / 16,
         '1:1': 1.0,
+        '4:3': 4 / 3,
         '940:788': 940 / 788,
     }
     
@@ -58,6 +59,7 @@ class TrackingImage(models.Model):
         ('16:9', 'Horizontal (16:9)'),
         ('9:16', 'Vertical (9:16)'),
         ('1:1', 'Cuadrado (1:1)'),
+        ('4:3', 'Portarretrato (4:3)'),
         ('940:788', 'Facebook (940x788)'),
     ]
 

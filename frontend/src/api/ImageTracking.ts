@@ -9,7 +9,7 @@ export interface TrackingImage {
   title: string;
   description: string;
   image_url: string;
-  aspect_ratio: "16:9" | "9:16";
+  aspect_ratio: "16:9" | "9:16" | "1:1" | "4:3" | "940:788";
   file_size?: number;
   width?: number;
   height?: number;
