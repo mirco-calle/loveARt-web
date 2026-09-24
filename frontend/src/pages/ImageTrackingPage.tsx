@@ -21,7 +21,7 @@ interface UploadState {
   isPublic: boolean;
   imagePreview: string | null;
   videoPreview: string | null;
-  aspectRatio: "16:9" | "9:16" | "1:1" | "940:788";
+  aspectRatio: "16:9" | "9:16" | "1:1" | "4:3" | "940:788";
   uploading: boolean;
   progress: number;
 }
@@ -230,6 +230,22 @@ export default function ImageTrackingPage() {
           <button
             type="button"
             onClick={() =>
+              setState((prev) => ({ ...prev, aspectRatio: "4:3" }))
+            }
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all duration-300 ${state.aspectRatio === "4:3"
+              ? "bg-cyan-500/10 border-cyan-500/40 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
+              : "bg-white/2 border-white/5 text-slate-500 hover:bg-white/5"
+              }`}
+          >
+            <span className="material-symbols-outlined text-base leading-none">
+              crop_landscape
+            </span>
+            <span className="text-xs font-bold tracking-tight">4:3 Portarretrato</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() =>
               setState((prev) => ({ ...prev, aspectRatio: "940:788" }))
             }
             className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all duration-300 ${state.aspectRatio === "940:788"
@@ -265,7 +281,9 @@ export default function ImageTrackingPage() {
                   ? "1080x1920"
                   : state.aspectRatio === "1:1"
                     ? "1080x1080"
-                    : "940x788"}
+                    : state.aspectRatio === "4:3"
+                      ? "1440x1080 (4:3)"
+                      : "940x788"}
             </span>
             <span className="w-1 h-1 bg-white/20 rounded-full" />
             <span className="text-slate-400">MAX 2MB</span>
@@ -286,7 +304,9 @@ export default function ImageTrackingPage() {
                   ? "9:16 MP4"
                   : state.aspectRatio === "1:1"
                     ? "1:1 MP4"
-                    : "940:788 MP4"}
+                    : state.aspectRatio === "4:3"
+                      ? "4:3 MP4"
+                      : "940:788 MP4"}
             </span>
             <span className="w-1 h-1 bg-white/20 rounded-full" />
             <span className="text-slate-400">MAX 40MB</span>

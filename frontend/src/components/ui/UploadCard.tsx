@@ -11,13 +11,14 @@ interface UploadCardProps {
   disabled?: boolean;
   previewUrl?: string | null;
   isVideoPreview?: boolean;
-  aspectRatio?: "16:9" | "9:16" | "1:1" | "940:788";
+  aspectRatio?: "16:9" | "9:16" | "1:1" | "4:3" | "940:788";
 }
 
 const ASPECT_CLASSES: Record<string, string> = {
   "16:9": "aspect-[16/9] min-h-[200px]",
   "9:16": "aspect-[9/16] min-h-[340px] max-h-[500px]",
   "1:1": "aspect-square min-h-[220px]",
+  "4:3": "aspect-[4/3] min-h-[220px]",
   "940:788": "aspect-[940/788] min-h-[220px]",
 };
 
