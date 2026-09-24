@@ -56,7 +56,7 @@ export default function ImageTrackingPage() {
 
   // Límites sincronizados con el backend
   const MAX_IMAGE_SIZE_MB = 2;
-  const MAX_VIDEO_SIZE_MB = 40;
+  const MAX_VIDEO_SIZE_MB = 70;
 
   const handleImageSelect = useCallback((file: File) => {
     const sizeMb = file.size / (1024 * 1024);
@@ -341,7 +341,7 @@ export default function ImageTrackingPage() {
                       : "940:788 MP4"}
             </span>
             <span className="w-1 h-1 bg-white/20 rounded-full" />
-            <span className="text-slate-400">MAX 40MB</span>
+            <span className="text-slate-400">MAX 70MB</span>
           </div>
         </div>
       </motion.div>
