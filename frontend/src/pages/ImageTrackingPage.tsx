@@ -54,7 +54,19 @@ export default function ImageTrackingPage() {
     fetchProjects();
   }, []);
 
+  // Límites sincronizados con el backend
+  const MAX_IMAGE_SIZE_MB = 2;
+  const MAX_VIDEO_SIZE_MB = 40;
+
   const handleImageSelect = useCallback((file: File) => {
+    const sizeMb = file.size / (1024 * 1024);
+    if (sizeMb > MAX_IMAGE_SIZE_MB) {
+      toast.error(
+        `La imagen pesa ${sizeMb.toFixed(1)} MB. El límite máximo es ${MAX_IMAGE_SIZE_MB} MB.`
+      );
+      return;
+    }
+
     const preview = URL.createObjectURL(file);
     setState((prev) => ({
       ...prev,
@@ -66,6 +78,14 @@ export default function ImageTrackingPage() {
   }, []);
 
   const handleVideoSelect = useCallback((file: File) => {
+    const sizeMb = file.size / (1024 * 1024);
+    if (sizeMb > MAX_VIDEO_SIZE_MB) {
+      toast.error(
+        `El video pesa ${sizeMb.toFixed(1)} MB. El límite máximo es ${MAX_VIDEO_SIZE_MB} MB.`
+      );
+      return;
+    }
+
     const preview = URL.createObjectURL(file);
     setState((prev) => ({ ...prev, videoFile: file, videoPreview: preview }));
     toast.success(`Video seleccionado: ${file.name}`);
@@ -74,6 +94,18 @@ export default function ImageTrackingPage() {
   const handleUpload = async () => {
     if (!state.imageFile || !state.videoFile) {
       toast.error("Selecciona una imagen y un video");
+      return;
+    }
+
+    const imageMb = state.imageFile.size / (1024 * 1024);
+    if (imageMb > MAX_IMAGE_SIZE_MB) {
+      toast.error(`La imagen supera los ${MAX_IMAGE_SIZE_MB} MB permitidos.`);
+      return;
+    }
+
+    const videoMb = state.videoFile.size / (1024 * 1024);
+    if (videoMb > MAX_VIDEO_SIZE_MB) {
+      toast.error(`El video supera los ${MAX_VIDEO_SIZE_MB} MB permitidos (${videoMb.toFixed(1)} MB).`);
       return;
     }
 
@@ -372,36 +404,82 @@ export default function ImageTrackingPage() {
           {/* Selected files summary */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {state.imageFile && (
-              <div className="flex items-center gap-4 bg-white/5 p-3 rounded-xl border border-white/5">
-                <div className="h-10 w-10 rounded-lg bg-primary/20 flex items-center justify-center shrink-0">
-                  <span className="material-symbols-outlined text-primary">
-                    image
-                  </span>
+              <div
+                className={`flex items-center gap-4 p-3 rounded-xl border transition-colors ${
+                  state.imageFile.size / (1024 * 1024) > MAX_IMAGE_SIZE_MB
+                    ? "bg-red-500/10 border-red-500/30 text-red-300"
+                    : "bg-white/5 border-white/5"
+                }`}
+              >
+                <div
+                  className={`h-10 w-10 rounded-lg flex items-center justify-center shrink-0 ${
+                    state.imageFile.size / (1024 * 1024) > MAX_IMAGE_SIZE_MB
+                      ? "bg-red-500/20 text-red-400"
+                      : "bg-primary/20 text-primary"
+                  }`}
+                >
+                  <span className="material-symbols-outlined">image</span>
                 </div>
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium truncate text-slate-200">
                     {state.imageFile.name}
                   </p>
-                  <p className="text-[10px] text-slate-500 uppercase">
-                    {(state.imageFile.size / 1024 / 1024).toFixed(1)} MB
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <p
+                      className={`text-[10px] uppercase font-mono font-bold ${
+                        state.imageFile.size / (1024 * 1024) > MAX_IMAGE_SIZE_MB
+                          ? "text-red-400"
+                          : "text-slate-500"
+                      }`}
+                    >
+                      {(state.imageFile.size / 1024 / 1024).toFixed(1)} MB
+                    </p>
+                    {state.imageFile.size / (1024 * 1024) > MAX_IMAGE_SIZE_MB && (
+                      <span className="text-[10px] text-red-400 font-bold bg-red-500/20 px-1.5 py-0.5 rounded">
+                        Máx {MAX_IMAGE_SIZE_MB}MB
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
             {state.videoFile && (
-              <div className="flex items-center gap-4 bg-white/5 p-3 rounded-xl border border-white/5">
-                <div className="h-10 w-10 rounded-lg bg-secondary/20 flex items-center justify-center shrink-0">
-                  <span className="material-symbols-outlined text-secondary">
-                    movie
-                  </span>
+              <div
+                className={`flex items-center gap-4 p-3 rounded-xl border transition-colors ${
+                  state.videoFile.size / (1024 * 1024) > MAX_VIDEO_SIZE_MB
+                    ? "bg-red-500/10 border-red-500/30 text-red-300"
+                    : "bg-white/5 border-white/5"
+                }`}
+              >
+                <div
+                  className={`h-10 w-10 rounded-lg flex items-center justify-center shrink-0 ${
+                    state.videoFile.size / (1024 * 1024) > MAX_VIDEO_SIZE_MB
+                      ? "bg-red-500/20 text-red-400"
+                      : "bg-secondary/20 text-secondary"
+                  }`}
+                >
+                  <span className="material-symbols-outlined">movie</span>
                 </div>
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium truncate text-slate-200">
                     {state.videoFile.name}
                   </p>
-                  <p className="text-[10px] text-slate-500 uppercase">
-                    {(state.videoFile.size / 1024 / 1024).toFixed(1)} MB
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <p
+                      className={`text-[10px] uppercase font-mono font-bold ${
+                        state.videoFile.size / (1024 * 1024) > MAX_VIDEO_SIZE_MB
+                          ? "text-red-400"
+                          : "text-slate-500"
+                      }`}
+                    >
+                      {(state.videoFile.size / 1024 / 1024).toFixed(1)} MB
+                    </p>
+                    {state.videoFile.size / (1024 * 1024) > MAX_VIDEO_SIZE_MB && (
+                      <span className="text-[10px] text-red-400 font-bold bg-red-500/20 px-1.5 py-0.5 rounded">
+                        Máx {MAX_VIDEO_SIZE_MB}MB
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
@@ -423,10 +501,31 @@ export default function ImageTrackingPage() {
             </div>
           )}
 
+          {/* Alerta si algún archivo excede el tamaño */}
+          {((state.imageFile && state.imageFile.size / (1024 * 1024) > MAX_IMAGE_SIZE_MB) ||
+            (state.videoFile && state.videoFile.size / (1024 * 1024) > MAX_VIDEO_SIZE_MB)) && (
+            <div className="flex items-center gap-3 p-3.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-xs">
+              <span className="material-symbols-outlined text-red-400 shrink-0">
+                warning
+              </span>
+              <span>
+                {state.videoFile && state.videoFile.size / (1024 * 1024) > MAX_VIDEO_SIZE_MB
+                  ? `El video pesa ${(state.videoFile.size / 1024 / 1024).toFixed(1)} MB. Debes comprimirlo o elegir uno menor a ${MAX_VIDEO_SIZE_MB} MB antes de subir.`
+                  : `La imagen pesa ${(state.imageFile!.size / 1024 / 1024).toFixed(1)} MB. El límite máximo es ${MAX_IMAGE_SIZE_MB} MB.`}
+              </span>
+            </div>
+          )}
+
           <NeonButton
             fullWidth
             onClick={handleUpload}
-            disabled={!state.imageFile || !state.videoFile || state.uploading}
+            disabled={
+              !state.imageFile ||
+              !state.videoFile ||
+              state.uploading ||
+              state.imageFile.size / (1024 * 1024) > MAX_IMAGE_SIZE_MB ||
+              state.videoFile.size / (1024 * 1024) > MAX_VIDEO_SIZE_MB
+            }
             className="h-12 md:h-14 text-base md:text-lg"
           >
             <span className="material-symbols-outlined">
@@ -434,6 +533,10 @@ export default function ImageTrackingPage() {
             </span>
             {state.uploading
               ? `Subiendo ${state.progress}%`
+              : state.videoFile && state.videoFile.size / (1024 * 1024) > MAX_VIDEO_SIZE_MB
+              ? `Video Excede ${MAX_VIDEO_SIZE_MB}MB`
+              : state.imageFile && state.imageFile.size / (1024 * 1024) > MAX_IMAGE_SIZE_MB
+              ? `Imagen Excede ${MAX_IMAGE_SIZE_MB}MB`
               : "Lanzar Proyecto AR"}
           </NeonButton>
         </motion.div>
