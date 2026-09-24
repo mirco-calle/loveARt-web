@@ -75,7 +75,11 @@ def send_otp_email(user, code):
     if html_content:
         email.attach_alternative(html_content, 'text/html')
 
-    email.send(fail_silently=False)
+    try:
+        email.send(fail_silently=False)
+        print(f'[EMAIL] ✅ Verification code successfully sent to {user.email}')
+    except Exception as e:
+        print(f'[EMAIL] ❌ Failed sending email to {user.email}: {e}')
 
 
 

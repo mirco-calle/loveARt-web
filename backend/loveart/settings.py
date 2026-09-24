@@ -246,15 +246,23 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 104857600    # 100 MB
 
 EMAIL_BACKEND = os.environ.get(
     'EMAIL_BACKEND',
-    'django.core.mail.backends.console.EmailBackend',  # Fallback: print to console
+    'django.core.mail.backends.console.EmailBackend',
 )
 
-# Gmail OAuth2 credentials (reuse existing Google OAuth app)
+# Standard SMTP configuration (Gmail, SendGrid, etc.)
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True').lower() in ('true', '1', 't')
+EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', 'False').lower() in ('true', '1', 't')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+
+# Gmail OAuth2 credentials (fallback mechanism)
 GMAIL_CLIENT_ID = os.environ.get('GOOGLE_OAUTH_CLIENT_ID', '')
 GMAIL_CLIENT_SECRET = os.environ.get('GOOGLE_OAUTH_CLIENT_SECRET', '')
 GMAIL_REFRESH_TOKEN = os.environ.get('GMAIL_REFRESH_TOKEN', '')
 
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'LoveArt <noreply@loveart.app>')
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER or 'LoveArt <noreply@loveart.app>')
 
 # ============================================
 # STORAGE CONFIGURATION (Supabase Storage / S3)
