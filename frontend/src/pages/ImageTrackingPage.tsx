@@ -8,6 +8,7 @@ import ToggleSwitch from "../components/ui/ToggleSwitch";
 import NeonButton from "../components/ui/NeonButton";
 import {
   createTrackingImage,
+  setTrackingImageVisibility,
   uploadTrackingVideo,
   getTrackingImages,
   TrackingImage,
@@ -30,7 +31,9 @@ const ALLOWED_VIDEO_EXTENSIONS = ["mp4", "webm", "mov", "avi"];
 
 const hasAllowedVideoExtension = (file: File) => {
   const extension = file.name.split(".").pop()?.toLowerCase();
-  return extension !== undefined && ALLOWED_VIDEO_EXTENSIONS.includes(extension);
+  return (
+    extension !== undefined && ALLOWED_VIDEO_EXTENSIONS.includes(extension)
+  );
 };
 
 export default function ImageTrackingPage() {
@@ -47,6 +50,9 @@ export default function ImageTrackingPage() {
     progress: 0,
   });
   const [projects, setProjects] = useState<TrackingImage[]>([]);
+  const [updatingVisibility, setUpdatingVisibility] = useState<number | null>(
+    null
+  );
 
   // Fetch projects on load
   useEffect(() => {
@@ -192,6 +198,34 @@ export default function ImageTrackingPage() {
         : "Error al subir. Intenta de nuevo.";
       toast.error(`Error: ${serverMsg}`);
       setState((prev) => ({ ...prev, uploading: false, progress: 0 }));
+    }
+  };
+
+  const handleVisibilityChange = async (
+    projectId: number,
+    isPublic: boolean
+  ) => {
+    if (updatingVisibility !== null) return;
+
+    setUpdatingVisibility(projectId);
+    try {
+      await setTrackingImageVisibility(projectId, isPublic);
+      setProjects((currentProjects) =>
+        currentProjects.map((project) =>
+          project.id === projectId
+            ? { ...project, is_public: isPublic }
+            : project
+        )
+      );
+      toast.success(
+        isPublic
+          ? "Proyecto publicado en el catálogo."
+          : "Proyecto marcado como privado."
+      );
+    } catch {
+      toast.error("No se pudo cambiar la visibilidad del proyecto.");
+    } finally {
+      setUpdatingVisibility(null);
     }
   };
 
@@ -643,14 +677,32 @@ export default function ImageTrackingPage() {
             </div>
           ) : (
             projects.map((project) => (
-              <CompletedItem
-                key={project.id}
-                filename={project.title}
-                thumbnailUrl={project.image_url}
-                meta={`${project.aspect_ratio} • ${
-                  project.is_public ? "🌐 Cloud" : "🔒 Private"
-                } • ${new Date(project.created_at).toLocaleDateString()}`}
-              />
+              <div key={project.id} className="flex flex-col gap-2">
+                <CompletedItem
+                  filename={project.title}
+                  thumbnailUrl={project.image_url}
+                  meta={`${project.aspect_ratio} • ${
+                    project.is_public ? "🌐 Cloud" : "🔒 Private"
+                  } • ${new Date(project.created_at).toLocaleDateString()}`}
+                />
+                {user?.is_admin && (
+                  <div className="px-3">
+                    <ToggleSwitch
+                      checked={project.is_public}
+                      onChange={(isPublic) =>
+                        handleVisibilityChange(project.id, isPublic)
+                      }
+                      disabled={updatingVisibility === project.id}
+                      label={project.is_public ? "Público" : "Privado"}
+                      description={
+                        updatingVisibility === project.id
+                          ? "Guardando cambio..."
+                          : "Visibilidad en el catálogo público"
+                      }
+                    />
+                  </div>
+                )}
+              </div>
             ))
           )}
         </div>

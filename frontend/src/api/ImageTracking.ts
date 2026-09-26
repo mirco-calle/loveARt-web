@@ -53,6 +53,15 @@ export const createTrackingImage = (formData: FormData) =>
     headers: { "Content-Type": "multipart/form-data" },
   });
 
+/** Change visibility of an existing tracking image */
+export const setTrackingImageVisibility = (imageId: number, isPublic: boolean) => {
+  const formData = new FormData();
+  formData.append("is_public", String(isPublic));
+  return api.patch(`/tracking/images/${imageId}/update/`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+};
+
 /** Upload video for a tracking image */
 export const uploadTrackingVideo = (imageId: number, formData: FormData) =>
   api.post(`/tracking/images/${imageId}/video/`, formData, {

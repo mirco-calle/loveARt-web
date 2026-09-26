@@ -3,6 +3,7 @@ interface ToggleSwitchProps {
   onChange: (checked: boolean) => void;
   label?: string;
   description?: string;
+  disabled?: boolean;
 }
 
 /**
@@ -14,6 +15,7 @@ export default function ToggleSwitch({
   onChange,
   label = "Público",
   description,
+  disabled = false,
 }: ToggleSwitchProps) {
   return (
     <label className="flex items-center justify-between cursor-pointer group">
@@ -29,8 +31,9 @@ export default function ToggleSwitch({
         type="button"
         role="switch"
         aria-checked={checked}
+        disabled={disabled}
         onClick={() => onChange(!checked)}
-        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ${
+        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-50 ${
           checked ? "bg-primary" : "bg-white/10"
         }`}
       >

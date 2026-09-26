@@ -37,7 +37,10 @@ def tracking_image_create(request):
     Upload a new tracking image (target for AR).
     Expects multipart/form-data with fields: title, description, image.
     """
-    serializer = TrackingImageCreateSerializer(data=request.data)
+    serializer = TrackingImageCreateSerializer(
+        data=request.data,
+        context={'request': request},
+    )
     serializer.is_valid(raise_exception=True)
     serializer.save(user=request.user)
 
@@ -80,6 +83,7 @@ def tracking_image_update(request, pk):
         image,
         data=request.data,
         partial=request.method == 'PATCH',
+        context={'request': request},
     )
     serializer.is_valid(raise_exception=True)
     serializer.save()
