@@ -26,6 +26,13 @@ interface UploadState {
   progress: number;
 }
 
+const ALLOWED_VIDEO_EXTENSIONS = ["mp4", "webm", "mov", "avi"];
+
+const hasAllowedVideoExtension = (file: File) => {
+  const extension = file.name.split(".").pop()?.toLowerCase();
+  return extension !== undefined && ALLOWED_VIDEO_EXTENSIONS.includes(extension);
+};
+
 export default function ImageTrackingPage() {
   const user = useAuthStore((s) => s.user);
   const [state, setState] = useState<UploadState>({
@@ -80,6 +87,15 @@ export default function ImageTrackingPage() {
   }, []);
 
   const handleVideoSelect = useCallback((file: File) => {
+    if (!hasAllowedVideoExtension(file)) {
+      toast.error(
+        `Formato de video no permitido. Usa: ${ALLOWED_VIDEO_EXTENSIONS.join(
+          ", "
+        ).toUpperCase()}.`
+      );
+      return;
+    }
+
     const sizeMb = file.size / (1024 * 1024);
     if (sizeMb > MAX_VIDEO_SIZE_MB) {
       toast.error(
@@ -98,6 +114,15 @@ export default function ImageTrackingPage() {
   const handleUpload = async () => {
     if (!state.imageFile || !state.videoFile) {
       toast.error("Selecciona una imagen y un video");
+      return;
+    }
+
+    if (!hasAllowedVideoExtension(state.videoFile)) {
+      toast.error(
+        `Formato de video no permitido. Usa: ${ALLOWED_VIDEO_EXTENSIONS.join(
+          ", "
+        ).toUpperCase()}.`
+      );
       return;
     }
 
@@ -386,8 +411,8 @@ export default function ImageTrackingPage() {
         <UploadCard
           icon="movie"
           title="Video de Aumento"
-          formats="MP4, MOV, WebM"
-          accept="video/*,.mp4,.mov,.webm"
+          formats="MP4, MOV, WebM, AVI"
+          accept=".mp4,.MP4,.mov,.MOV,.webm,.WEBM,.avi,.AVI"
           onFileSelect={handleVideoSelect}
           disabled={state.uploading}
           previewUrl={state.videoPreview}
