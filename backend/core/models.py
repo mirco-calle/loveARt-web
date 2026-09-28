@@ -1,5 +1,6 @@
 import os
 from django.db import models
+from django.core.files.storage import storages
 from django.core.validators import FileExtensionValidator
 from django.core.exceptions import ValidationError
 
@@ -18,6 +19,7 @@ class AppBuild(models.Model):
     version = models.CharField(max_length=50, help_text="Ej: 1.0.0, v2.1")
     apk_file = models.FileField(
         upload_to=app_build_path,
+        storage=storages["apkfiles"],  # Local filesystem — NOT Supabase (APK > 50MB free limit)
         validators=[
             FileExtensionValidator(allowed_extensions=['apk']),
             validate_apk_size

@@ -38,7 +38,7 @@ echo "⚙️  Iniciando Gunicorn con $WORKERS worker(s)..."
 echo "✅ Starting Gunicorn on port ${PORT:-8000}..."
 exec gunicorn --bind 0.0.0.0:${PORT:-8000} \
     --workers $WORKERS \
-    --timeout 120 \
+    --timeout 300 \
     --max-requests 1000 \
     --max-requests-jitter 50 \
     --access-logfile - \

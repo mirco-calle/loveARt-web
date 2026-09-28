@@ -233,10 +233,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'uploads')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ============================================
-# FILE UPLOAD LIMITS (for video uploads)
+# FILE UPLOAD LIMITS
 # ============================================
-DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600    # 100 MB
-FILE_UPLOAD_MAX_MEMORY_SIZE = 104857600    # 100 MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600    # 100 MB — max POST body size
+FILE_UPLOAD_MAX_MEMORY_SIZE = 0            # 0 = stream directly to /tmp (no RAM buffering)
+                                           # Critical for large APK uploads on 1GB RAM VM
 
 # ============================================
 # EMAIL — Gmail API via OAuth2 (same as n8n Gmail node)
@@ -289,7 +290,16 @@ AWS_S3_CUSTOM_DOMAIN = os.environ.get('AWS_S3_CUSTOM_DOMAIN')
 if all([AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_STORAGE_BUCKET_NAME]):
     STORAGES = {
         "default": {
+            # Images & videos → Supabase Storage (files < 50MB)
             "BACKEND": "loveart.storages_backends.SupabaseMediaStorage",
+        },
+        "apkfiles": {
+            # APK builds → local filesystem (files > 50MB, not supported by Supabase free tier)
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+            "OPTIONS": {
+                "location": str(BASE_DIR / "uploads"),
+                "base_url": "/uploads/",
+            },
         },
         "staticfiles": {
             "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
