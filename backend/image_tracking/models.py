@@ -145,7 +145,7 @@ class TrackingImage(models.Model):
             qr_img = qr.make_image(fill_color="black", back_color="white")
 
             qr_output = BytesIO()
-            qr_img.save(qr_output, format='PNG')
+            qr_img.save(qr_output)
             qr_output.seek(0)
             self.qr_code_image = ContentFile(qr_output.read(), name=f"qr_{self.activation_pin}.png")
 

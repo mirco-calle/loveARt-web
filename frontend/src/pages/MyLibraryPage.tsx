@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import GlassCard from "../components/ui/GlassCard";
 import AssetLibraryItem from "../components/ui/AssetLibraryItem";
 import ModalConfirm from "../components/common/ModalConfirm";
+import ActivationKitModal from "../components/common/ActivationKitModal";
 import { getTrackingImages, deleteTrackingImage } from "../api/ImageTracking";
 import type { TrackingImage } from "../api/ImageTracking";
 
@@ -17,6 +18,10 @@ export default function MyLibraryPage() {
     id: number;
     title: string;
   } | null>(null);
+
+  // States for Activation Kit modal
+  const [selectedKitProject, setSelectedKitProject] = useState<TrackingImage | null>(null);
+  const [isKitOpen, setIsKitOpen] = useState(false);
 
   const loadData = async () => {
     setLoading(true);
@@ -156,12 +161,17 @@ export default function MyLibraryPage() {
               title={ti.title}
               thumbnailUrl={ti.image_url}
               aspectRatio={ti.aspect_ratio}
+              pin={ti.activation_pin}
               fileSize={ti.file_size}
               width={ti.width}
               height={ti.height}
               createdAt={ti.created_at}
               isPublic={ti.is_public}
               videoSize={ti.video?.file_size}
+              onOpenKit={() => {
+                setSelectedKitProject(ti);
+                setIsKitOpen(true);
+              }}
               onDelete={() =>
                 setItemToDelete({
                   id: ti.id,
@@ -184,6 +194,16 @@ export default function MyLibraryPage() {
         isLoading={isDeleting}
         variant="danger"
         icon="delete_forever"
+      />
+
+      {/* Kit de Activación Modal */}
+      <ActivationKitModal
+        isOpen={isKitOpen}
+        onClose={() => {
+          setIsKitOpen(false);
+          setSelectedKitProject(null);
+        }}
+        project={selectedKitProject}
       />
     </div>
   );

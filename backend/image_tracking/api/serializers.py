@@ -21,7 +21,7 @@ def ensure_qr_code(obj):
             qr.make(fit=True)
             qr_img = qr.make_image(fill_color="black", back_color="white")
             qr_output = BytesIO()
-            qr_img.save(qr_output, format='PNG')
+            qr_img.save(qr_output)
             qr_output.seek(0)
             obj.qr_code_image.save(f"qr_{obj.activation_pin}.png", ContentFile(qr_output.read()), save=True)
         except Exception as e:

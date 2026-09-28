@@ -10,7 +10,6 @@ from image_tracking.api.serializers import (
     TrackingVideoSerializer,
     TrackingVideoUploadSerializer,
     TrackingExperienceDataSerializer,
-    TrackingDataForUnitySerializer,
 )
 
 
@@ -163,8 +162,6 @@ def tracking_video_delete(request, image_pk):
 # ============================================
 # UNITY ENDPOINT (Public or Token-based)
 # ============================================
-
-from django.db.models import Q
 
 @api_view(['GET'])
 def unity_tracking_data(request):

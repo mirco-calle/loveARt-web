@@ -6,6 +6,7 @@ interface AssetLibraryItemProps {
   thumbnailUrl?: string;
   type?: "tracking";
   aspectRatio?: string;
+  pin?: string;
   fileSize?: number;
   width?: number;
   height?: number;
@@ -13,6 +14,7 @@ interface AssetLibraryItemProps {
   createdAt: string;
   isPublic: boolean;
   videoSize?: number;
+  onOpenKit?: () => void;
   onOptions?: () => void;
   onDelete?: () => void;
 }
@@ -21,6 +23,7 @@ export default function AssetLibraryItem({
   title,
   thumbnailUrl,
   aspectRatio,
+  pin,
   fileSize,
   width,
   height,
@@ -28,6 +31,7 @@ export default function AssetLibraryItem({
   createdAt,
   isPublic,
   videoSize,
+  onOpenKit,
   onOptions,
   onDelete,
 }: AssetLibraryItemProps) {
@@ -92,6 +96,21 @@ export default function AssetLibraryItem({
                     </span>
                   </button>
                 )}
+                {onOpenKit && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onOpenKit();
+                    }}
+                    className="flex items-center gap-1 p-1 px-2 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-400 hover:text-purple-300 hover:border-purple-500/40 transition-all text-xs"
+                    title="Kit QR y Activación"
+                  >
+                    <span className="material-symbols-outlined text-[16px]">
+                      qr_code_2
+                    </span>
+                    <span className="text-[11px] font-medium hidden sm:inline">Kit QR</span>
+                  </button>
+                )}
                 {onDelete && (
                   <button
                     onClick={(e) => {
@@ -120,7 +139,19 @@ export default function AssetLibraryItem({
         </div>
 
         {/* Technical Data Grid */}
-        <div className="flex flex-wrap gap-x-4 gap-y-2 mt-3 pt-3 border-t border-white/5">
+        <div className="flex flex-wrap gap-x-4 gap-y-2 mt-3 pt-3 border-t border-white/5 items-center">
+          {/* Activation PIN */}
+          {pin && (
+            <div className="flex items-center gap-1 px-2 py-0.5 bg-purple-500/15 rounded-full border border-purple-500/25">
+              <span className="material-symbols-outlined text-[13px] text-purple-400">
+                key
+              </span>
+              <span className="text-[10px] text-purple-300 font-bold font-mono tracking-wider">
+                PIN: {pin}
+              </span>
+            </div>
+          )}
+
           {/* Resolution / Format */}
           <div className="flex items-center gap-1.5">
             <span className="material-symbols-outlined text-[14px] text-slate-600">

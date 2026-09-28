@@ -12,7 +12,7 @@ def global_public_catalog(request):
     Unified public catalog for the mobile app "Guest Mode".
     Returns tracking images and videos.
     """
-    public_images = TrackingImage.objects.filter(is_public=True).select_related('video')
+    public_images = TrackingImage.objects.filter(is_public=True, is_active=True).select_related('video')
 
     image_serializer = TrackingExperienceDataSerializer(
         public_images, many=True, context={'request': request}
