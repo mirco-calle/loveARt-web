@@ -26,6 +26,35 @@ interface UploadState {
 
 const ALLOWED_VIDEO_EXTENSIONS = ["mp4", "webm", "mov", "avi"];
 
+type AspectRatioType = "16:9" | "9:16" | "1:1" | "4:3" | "940:788";
+
+const detectBestAspectRatio = (
+  width: number,
+  height: number
+): { ratio: AspectRatioType; label: string } => {
+  const currentRatio = width / height;
+  const candidates: { ratio: AspectRatioType; value: number; label: string }[] = [
+    { ratio: "16:9", value: 16 / 9, label: "16:9 Horizontal" },
+    { ratio: "9:16", value: 9 / 16, label: "9:16 Vertical" },
+    { ratio: "1:1", value: 1.0, label: "1:1 Cuadrado" },
+    { ratio: "4:3", value: 4 / 3, label: "4:3 Portarretrato" },
+    { ratio: "940:788", value: 940 / 788, label: "Facebook (940:788)" },
+  ];
+
+  let best = candidates[0];
+  let minDiff = Math.abs(currentRatio - best.value);
+
+  for (let i = 1; i < candidates.length; i++) {
+    const diff = Math.abs(currentRatio - candidates[i].value);
+    if (diff < minDiff) {
+      minDiff = diff;
+      best = candidates[i];
+    }
+  }
+
+  return { ratio: best.ratio, label: best.label };
+};
+
 const hasAllowedVideoExtension = (file: File) => {
   const extension = file.name.split(".").pop()?.toLowerCase();
   return (
@@ -44,6 +73,7 @@ export default function ImageTrackingPage() {
     uploading: false,
     progress: 0,
   });
+  const [autoDetectedRatio, setAutoDetectedRatio] = useState<string | null>(null);
   const [projects, setProjects] = useState<TrackingImage[]>([]);
   const [selectedKitProject, setSelectedKitProject] = useState<TrackingImage | null>(null);
   const [isKitOpen, setIsKitOpen] = useState(false);
@@ -77,6 +107,20 @@ export default function ImageTrackingPage() {
     }
 
     const preview = URL.createObjectURL(file);
+
+    // Auto-detectar aspecto real de la imagen
+    const img = new window.Image();
+    img.onload = () => {
+      const detected = detectBestAspectRatio(img.naturalWidth, img.naturalHeight);
+      setState((prev) => ({
+        ...prev,
+        aspectRatio: detected.ratio,
+      }));
+      setAutoDetectedRatio(`${detected.label} (${img.naturalWidth}x${img.naturalHeight}px)`);
+      toast.info(`Formato detectado automáticamente: ${detected.label}`);
+    };
+    img.src = preview;
+
     setState((prev) => ({
       ...prev,
       imageFile: file,
@@ -107,6 +151,24 @@ export default function ImageTrackingPage() {
     }
 
     const preview = URL.createObjectURL(file);
+
+    // Si aún no hay imagen seleccionada, pre-sugerir aspecto según el video
+    const videoEl = document.createElement("video");
+    videoEl.preload = "metadata";
+    videoEl.onloadedmetadata = () => {
+      if (videoEl.videoWidth && videoEl.videoHeight) {
+        setState((prev) => {
+          if (!prev.imageFile) {
+            const detected = detectBestAspectRatio(videoEl.videoWidth, videoEl.videoHeight);
+            setAutoDetectedRatio(`${detected.label} (desde video: ${videoEl.videoWidth}x${videoEl.videoHeight}px)`);
+            return { ...prev, aspectRatio: detected.ratio };
+          }
+          return prev;
+        });
+      }
+    };
+    videoEl.src = preview;
+
     setState((prev) => ({ ...prev, videoFile: file, videoPreview: preview }));
     toast.success(`Video seleccionado: ${file.name}`);
   }, []);
@@ -188,6 +250,7 @@ export default function ImageTrackingPage() {
           uploading: false,
           progress: 0,
         });
+        setAutoDetectedRatio(null);
       }, 1000);
     } catch (error: any) {
       console.error("Error al subir:", error);
@@ -242,10 +305,16 @@ export default function ImageTrackingPage() {
         transition={{ delay: 0.1 }}
         className="flex flex-col sm:flex-row items-start sm:items-center gap-3 bg-white/2 p-3 px-4 rounded-2xl border border-white/5"
       >
-        <div className="flex items-center gap-2 text-slate-400">
+        <div className="flex flex-wrap items-center gap-2 text-slate-400">
           <span className="text-xs font-bold uppercase tracking-widest">
             Relación:
           </span>
+          {autoDetectedRatio && (
+            <span className="text-[10px] font-bold text-cyan-400 bg-cyan-500/10 border border-cyan-500/25 px-2 py-0.5 rounded-full flex items-center gap-1 animate-pulse">
+              <span className="material-symbols-outlined text-[13px]">auto_awesome</span>
+              Auto: {autoDetectedRatio}
+            </span>
+          )}
         </div>
 
         <div className="flex flex-wrap gap-1.5">
