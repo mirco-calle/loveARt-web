@@ -91,7 +91,7 @@ export default function MyLibraryPage() {
       </div>
 
       {/* Stats Dashboard */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <GlassCard className="p-4 md:p-5 flex flex-col justify-between border-white/10 hover:border-primary/30 transition-colors">
           <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
             Total Proyectos
@@ -104,21 +104,21 @@ export default function MyLibraryPage() {
         </GlassCard>
         <GlassCard className="p-4 md:p-5 flex flex-col justify-between border-white/10 hover:border-primary/30 transition-colors">
           <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-500/70">
-            Públicos
+            Con Video AR
           </span>
           <div className="mt-2 flex items-baseline gap-1">
             <p className="text-3xl md:text-4xl font-bold text-white tracking-tighter">
-              {trackingImages.filter((i) => i.is_public).length}
+              {trackingImages.filter((i) => !!i.video).length}
             </p>
           </div>
         </GlassCard>
         <GlassCard className="p-4 md:p-5 flex flex-col justify-between border-white/10 hover:border-primary/30 transition-colors">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-amber-500/70">
-            Privados
+          <span className="text-[10px] font-bold uppercase tracking-widest text-purple-400">
+            Kits PIN/QR Listos
           </span>
           <div className="mt-2 flex items-baseline gap-1">
             <p className="text-3xl md:text-4xl font-bold text-white tracking-tighter">
-              {trackingImages.filter((i) => !i.is_public).length}
+              {trackingImages.filter((i) => !!i.activation_pin).length}
             </p>
           </div>
         </GlassCard>
@@ -166,7 +166,6 @@ export default function MyLibraryPage() {
               width={ti.width}
               height={ti.height}
               createdAt={ti.created_at}
-              isPublic={ti.is_public}
               videoSize={ti.video?.file_size}
               onOpenKit={() => {
                 setSelectedKitProject(ti);

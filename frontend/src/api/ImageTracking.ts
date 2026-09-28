@@ -17,7 +17,7 @@ export interface TrackingImage {
   width?: number;
   height?: number;
   is_active: boolean;
-  is_public: boolean;
+  is_public?: boolean;
   video: TrackingVideo | null;
   created_at: string;
 }
@@ -42,7 +42,7 @@ export interface TrackingExperienceData {
   resolution: string | null;
   image_size: number;
   video_size: number;
-  is_public: boolean;
+  is_public?: boolean;
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -57,15 +57,6 @@ export const createTrackingImage = (formData: FormData) =>
   api.post("/tracking/images/create/", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
-
-/** Change visibility of an existing tracking image */
-export const setTrackingImageVisibility = (imageId: number, isPublic: boolean) => {
-  const formData = new FormData();
-  formData.append("is_public", String(isPublic));
-  return api.patch(`/tracking/images/${imageId}/update/`, formData, {
-    headers: { "Content-Type": "multipart/form-data" },
-  });
-};
 
 /** Upload video for a tracking image */
 export const uploadTrackingVideo = (imageId: number, formData: FormData) =>

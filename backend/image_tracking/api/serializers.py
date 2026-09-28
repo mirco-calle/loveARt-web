@@ -115,16 +115,8 @@ class TrackingImageCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TrackingImage
-        fields = ['id', 'title', 'description', 'aspect_ratio', 'image', 'is_public']
+        fields = ['id', 'title', 'description', 'aspect_ratio', 'image']
         read_only_fields = ['id']
-
-    def validate_is_public(self, value):
-        request = self.context.get('request')
-        user = getattr(request, 'user', None)
-        is_admin = getattr(getattr(user, 'profile', None), 'is_admin', False)
-        if value and not is_admin:
-            raise serializers.ValidationError('Solo los administradores pueden publicar proyectos.')
-        return value
 
 
 class TrackingVideoUploadSerializer(serializers.ModelSerializer):

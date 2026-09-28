@@ -12,7 +12,6 @@ interface AssetLibraryItemProps {
   height?: number;
   originalFormat?: string;
   createdAt: string;
-  isPublic: boolean;
   videoSize?: number;
   onOpenKit?: () => void;
   onOptions?: () => void;
@@ -29,7 +28,6 @@ export default function AssetLibraryItem({
   height,
   originalFormat,
   createdAt,
-  isPublic,
   videoSize,
   onOpenKit,
   onOptions,

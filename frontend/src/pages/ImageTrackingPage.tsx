@@ -12,7 +12,6 @@ import {
   getTrackingImages,
   TrackingImage,
 } from "../api/ImageTracking";
-import { useAuthStore } from "../hooks/useAuthStore";
 
 interface UploadState {
   title: string;
@@ -35,7 +34,6 @@ const hasAllowedVideoExtension = (file: File) => {
 };
 
 export default function ImageTrackingPage() {
-  const user = useAuthStore((s) => s.user);
   const [state, setState] = useState<UploadState>({
     title: "",
     imageFile: null,
