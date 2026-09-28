@@ -135,7 +135,7 @@ export default function ActivationKitModal({
                     {project.aspect_ratio}
                   </span>
                   <span>•</span>
-                  <span>{project.is_public ? "Catálogo Público" : "Privado"}</span>
+                  <span>Recuerdo en Realidad Aumentada</span>
                 </div>
               </div>
             </div>

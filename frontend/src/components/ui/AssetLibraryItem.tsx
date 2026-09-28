@@ -70,18 +70,23 @@ export default function AssetLibraryItem({
               {title}
             </h4>
             <div className="flex items-center gap-2 shrink-0">
-              <span
-                className={`text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded-md border ${
-                  isPublic
-                    ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
-                    : "bg-slate-500/10 text-slate-500 border-white/5"
-                }`}
-              >
-                {isPublic ? "Public" : "Private"}
-              </span>
-
-              {/* Action Buttons - Always visible on small screens, hover on large */}
-              <div className="flex items-center gap-1 ml-1 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300">
+              {/* Action Buttons - Always visible */}
+              <div className="flex items-center gap-1.5 ml-1">
+                {onOpenKit && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onOpenKit();
+                    }}
+                    className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/30 text-purple-300 hover:text-white transition-all text-xs font-semibold shadow-sm shadow-purple-500/10 active:scale-95"
+                    title="Ver QR y Kit de Activación"
+                  >
+                    <span className="material-symbols-outlined text-[16px]">
+                      qr_code_2
+                    </span>
+                    <span>Kit QR</span>
+                  </button>
+                )}
                 {onOptions && (
                   <button
                     onClick={(e) => {
@@ -94,21 +99,6 @@ export default function AssetLibraryItem({
                     <span className="material-symbols-outlined text-[16px]">
                       settings
                     </span>
-                  </button>
-                )}
-                {onOpenKit && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onOpenKit();
-                    }}
-                    className="flex items-center gap-1 p-1 px-2 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-400 hover:text-purple-300 hover:border-purple-500/40 transition-all text-xs"
-                    title="Kit QR y Activación"
-                  >
-                    <span className="material-symbols-outlined text-[16px]">
-                      qr_code_2
-                    </span>
-                    <span className="text-[11px] font-medium hidden sm:inline">Kit QR</span>
                   </button>
                 )}
                 {onDelete && (

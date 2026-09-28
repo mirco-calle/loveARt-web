@@ -50,11 +50,11 @@ export default function CompletedItem({
       {onOpenKit && (
         <button
           onClick={onOpenKit}
-          className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-purple-600/15 hover:bg-purple-600/25 border border-purple-500/30 text-purple-300 text-xs font-medium transition-all active:scale-95 shrink-0"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/30 text-purple-300 hover:text-white text-xs font-semibold transition-all active:scale-95 shrink-0 shadow-sm shadow-purple-500/10"
           title="Ver QR y Kit de Activación"
         >
           <span className="material-symbols-outlined text-base">qr_code_2</span>
-          <span className="hidden sm:inline">Kit QR</span>
+          <span>Kit QR</span>
         </button>
       )}
 

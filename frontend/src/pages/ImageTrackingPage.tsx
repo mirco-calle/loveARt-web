@@ -4,12 +4,10 @@ import { motion } from "framer-motion";
 import UploadCard from "../components/ui/UploadCard";
 import ProgressBar from "../components/ui/ProgressBar";
 import CompletedItem from "../components/ui/CompletedItem";
-import ToggleSwitch from "../components/ui/ToggleSwitch";
 import NeonButton from "../components/ui/NeonButton";
 import ActivationKitModal from "../components/common/ActivationKitModal";
 import {
   createTrackingImage,
-  setTrackingImageVisibility,
   uploadTrackingVideo,
   getTrackingImages,
   TrackingImage,
@@ -20,7 +18,6 @@ interface UploadState {
   title: string;
   imageFile: File | null;
   videoFile: File | null;
-  isPublic: boolean;
   imagePreview: string | null;
   videoPreview: string | null;
   aspectRatio: "16:9" | "9:16" | "1:1" | "4:3" | "940:788";
@@ -43,7 +40,6 @@ export default function ImageTrackingPage() {
     title: "",
     imageFile: null,
     videoFile: null,
-    isPublic: false,
     imagePreview: null,
     videoPreview: null,
     aspectRatio: "16:9",
@@ -51,9 +47,6 @@ export default function ImageTrackingPage() {
     progress: 0,
   });
   const [projects, setProjects] = useState<TrackingImage[]>([]);
-  const [updatingVisibility, setUpdatingVisibility] = useState<number | null>(
-    null
-  );
   const [selectedKitProject, setSelectedKitProject] = useState<TrackingImage | null>(null);
   const [isKitOpen, setIsKitOpen] = useState(false);
 
@@ -159,7 +152,6 @@ export default function ImageTrackingPage() {
       imageData.append("image", state.imageFile);
       imageData.append("title", state.title || state.imageFile.name);
       imageData.append("aspect_ratio", state.aspectRatio);
-      imageData.append("is_public", String(state.isPublic));
 
       setState((prev) => ({ ...prev, progress: 30 }));
       const { data: imageResult } = await createTrackingImage(imageData);
@@ -192,7 +184,6 @@ export default function ImageTrackingPage() {
           title: "",
           imageFile: null,
           videoFile: null,
-          isPublic: false,
           imagePreview: null,
           videoPreview: null,
           aspectRatio: "16:9",
@@ -207,34 +198,6 @@ export default function ImageTrackingPage() {
         : "Error al subir. Intenta de nuevo.";
       toast.error(`Error: ${serverMsg}`);
       setState((prev) => ({ ...prev, uploading: false, progress: 0 }));
-    }
-  };
-
-  const handleVisibilityChange = async (
-    projectId: number,
-    isPublic: boolean
-  ) => {
-    if (updatingVisibility !== null) return;
-
-    setUpdatingVisibility(projectId);
-    try {
-      await setTrackingImageVisibility(projectId, isPublic);
-      setProjects((currentProjects) =>
-        currentProjects.map((project) =>
-          project.id === projectId
-            ? { ...project, is_public: isPublic }
-            : project
-        )
-      );
-      toast.success(
-        isPublic
-          ? "Proyecto publicado en el catálogo."
-          : "Proyecto marcado como privado."
-      );
-    } catch {
-      toast.error("No se pudo cambiar la visibilidad del proyecto.");
-    } finally {
-      setUpdatingVisibility(null);
     }
   };
 
@@ -574,19 +537,7 @@ export default function ImageTrackingPage() {
 
           <div className="h-px bg-white/5" />
 
-          {/* Public toggle - ONLY FOR ADMINS */}
-          {user?.is_admin && (
-            <div className="bg-white/5 p-4 rounded-2xl border border-white/5">
-              <ToggleSwitch
-                checked={state.isPublic}
-                onChange={(checked) =>
-                  setState((prev) => ({ ...prev, isPublic: checked }))
-                }
-                label="Visibilidad Pública"
-                description="Permitir que otros usuarios vean este aumento en el catálogo global."
-              />
-            </div>
-          )}
+
 
           {/* Alerta si algún archivo excede el tamaño */}
           {((state.imageFile &&
@@ -695,27 +646,8 @@ export default function ImageTrackingPage() {
                     setSelectedKitProject(project);
                     setIsKitOpen(true);
                   }}
-                  meta={`${project.aspect_ratio} • ${
-                    project.is_public ? "🌐 Cloud" : "🔒 Private"
-                  } • ${new Date(project.created_at).toLocaleDateString()}`}
+                  meta={`${project.aspect_ratio} • ${new Date(project.created_at).toLocaleDateString()}`}
                 />
-                {user?.is_admin && (
-                  <div className="px-3">
-                    <ToggleSwitch
-                      checked={project.is_public}
-                      onChange={(isPublic) =>
-                        handleVisibilityChange(project.id, isPublic)
-                      }
-                      disabled={updatingVisibility === project.id}
-                      label={project.is_public ? "Público" : "Privado"}
-                      description={
-                        updatingVisibility === project.id
-                          ? "Guardando cambio..."
-                          : "Visibilidad en el catálogo público"
-                      }
-                    />
-                  </div>
-                )}
               </div>
             ))
           )}

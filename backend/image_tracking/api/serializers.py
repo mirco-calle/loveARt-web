@@ -4,11 +4,25 @@ import qrcode
 from rest_framework import serializers
 from django.utils.text import slugify
 
-from image_tracking.models import TrackingImage, TrackingVideo
+from image_tracking.models import TrackingImage, TrackingVideo, generate_unique_pin
 
 
-def ensure_qr_code(obj):
-    """Genera la imagen QR si no existe todavía."""
+def ensure_pin_and_qr(obj):
+    """
+    Asegura que el proyecto tenga PIN y código QR generados,
+    incluso para registros creados anteriormente que no los tenían.
+    """
+    updated = False
+
+    # 1. Si no tiene PIN, generar uno único y asignarlo
+    if not obj.activation_pin:
+        pin = generate_unique_pin()
+        while TrackingImage.objects.filter(activation_pin=pin).exclude(pk=obj.pk).exists():
+            pin = generate_unique_pin()
+        obj.activation_pin = pin
+        updated = True
+
+    # 2. Si no tiene imagen QR, generarla
     if not obj.qr_code_image and obj.activation_pin:
         try:
             qr = qrcode.QRCode(
@@ -23,9 +37,17 @@ def ensure_qr_code(obj):
             qr_output = BytesIO()
             qr_img.save(qr_output)
             qr_output.seek(0)
-            obj.qr_code_image.save(f"qr_{obj.activation_pin}.png", ContentFile(qr_output.read()), save=True)
+            obj.qr_code_image.save(f"qr_{obj.activation_pin}.png", ContentFile(qr_output.read()), save=False)
+            updated = True
         except Exception as e:
             print(f"[QR GENERATION WARNING] {e}")
+
+    # Guardar en base de datos si se generó algo nuevo
+    if updated and obj.pk:
+        type(obj).objects.filter(pk=obj.pk).update(
+            activation_pin=obj.activation_pin,
+            qr_code_image=obj.qr_code_image
+        )
 
 
 class TrackingVideoSerializer(serializers.ModelSerializer):
@@ -78,10 +100,14 @@ class TrackingImageSerializer(serializers.ModelSerializer):
     def get_qr_code_url(self, obj):
         """Return absolute URL for downloading the QR code."""
         request = self.context.get('request')
-        ensure_qr_code(obj)
+        ensure_pin_and_qr(obj)
         if obj.qr_code_image and request:
             return request.build_absolute_uri(obj.qr_code_image.url)
         return None
+
+    def to_representation(self, instance):
+        ensure_pin_and_qr(instance)
+        return super().to_representation(instance)
 
 
 class TrackingImageCreateSerializer(serializers.ModelSerializer):
@@ -156,10 +182,14 @@ class TrackingExperienceDataSerializer(serializers.ModelSerializer):
 
     def get_qr_code_url(self, obj):
         request = self.context.get('request')
-        ensure_qr_code(obj)
+        ensure_pin_and_qr(obj)
         if obj.qr_code_image and request:
             return request.build_absolute_uri(obj.qr_code_image.url)
         return None
+
+    def to_representation(self, instance):
+        ensure_pin_and_qr(instance)
+        return super().to_representation(instance)
 
 
 class TrackingDataForUnitySerializer(TrackingExperienceDataSerializer):
