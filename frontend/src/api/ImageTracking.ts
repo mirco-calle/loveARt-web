@@ -10,6 +10,9 @@ export interface TrackingImage {
   description: string;
   image_url: string;
   aspect_ratio: "16:9" | "9:16" | "1:1" | "4:3" | "940:788";
+  activation_pin?: string;
+  qr_code_image?: string | null;
+  qr_code_url?: string | null;
   file_size?: number;
   width?: number;
   height?: number;
@@ -31,6 +34,8 @@ export interface TrackingExperienceData {
   name: string;
   title: string;
   description: string;
+  activation_pin?: string;
+  qr_code_url?: string | null;
   image_url: string;
   video_url: string | null;
   physical_width: number;

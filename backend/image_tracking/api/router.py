@@ -10,9 +10,13 @@ from image_tracking.api.views import (
     tracking_video_delete,
     unity_tracking_data,
     unity_tracking_catalog,
+    tracking_experience_activate,
 )
 
 urlpatterns = [
+    # Activation endpoint (Mobile App PIN/QR code)
+    path('activate/', tracking_experience_activate, name='tracking-activate'),
+
     # Tracking Images CRUD
     path('images/', tracking_image_list, name='tracking-image-list'),
     path('images/create/', tracking_image_create, name='tracking-image-create'),

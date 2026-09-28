@@ -1,7 +1,31 @@
+from io import BytesIO
+from django.core.files.base import ContentFile
+import qrcode
 from rest_framework import serializers
 from django.utils.text import slugify
 
 from image_tracking.models import TrackingImage, TrackingVideo
+
+
+def ensure_qr_code(obj):
+    """Genera la imagen QR si no existe todavía."""
+    if not obj.qr_code_image and obj.activation_pin:
+        try:
+            qr = qrcode.QRCode(
+                version=1,
+                error_correction=qrcode.constants.ERROR_CORRECT_M,
+                box_size=10,
+                border=4,
+            )
+            qr.add_data(obj.activation_pin)
+            qr.make(fit=True)
+            qr_img = qr.make_image(fill_color="black", back_color="white")
+            qr_output = BytesIO()
+            qr_img.save(qr_output, format='PNG')
+            qr_output.seek(0)
+            obj.qr_code_image.save(f"qr_{obj.activation_pin}.png", ContentFile(qr_output.read()), save=True)
+        except Exception as e:
+            print(f"[QR GENERATION WARNING] {e}")
 
 
 class TrackingVideoSerializer(serializers.ModelSerializer):
@@ -24,10 +48,11 @@ class TrackingVideoSerializer(serializers.ModelSerializer):
 class TrackingImageSerializer(serializers.ModelSerializer):
     """
     Serializer for TrackingImage.
-    Includes nested video data and absolute image URL.
+    Includes nested video data, absolute image URL and QR code URL.
     """
     video = TrackingVideoSerializer(read_only=True)
     image_url = serializers.SerializerMethodField()
+    qr_code_url = serializers.SerializerMethodField()
     user = serializers.ReadOnlyField(source='user.username')
 
     class Meta:
@@ -35,18 +60,27 @@ class TrackingImageSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'user', 'title', 'description',
             'aspect_ratio', 'image', 'image_url', 
+            'activation_pin', 'qr_code_image', 'qr_code_url',
             'file_size', 'width', 'height',
             'resolution', 'image_size', 'video_size', 'physical_width',
             'is_active', 'is_public',
             'video', 'created_at', 'updated_at',
         ]
-        read_only_fields = ['id', 'user', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'user', 'activation_pin', 'qr_code_image', 'created_at', 'updated_at']
 
     def get_image_url(self, obj):
         """Return absolute URL for Unity to download the image."""
         request = self.context.get('request')
         if obj.image and request:
             return request.build_absolute_uri(obj.image.url)
+        return None
+
+    def get_qr_code_url(self, obj):
+        """Return absolute URL for downloading the QR code."""
+        request = self.context.get('request')
+        ensure_qr_code(obj)
+        if obj.qr_code_image and request:
+            return request.build_absolute_uri(obj.qr_code_image.url)
         return None
 
 
@@ -78,20 +112,25 @@ class TrackingVideoUploadSerializer(serializers.ModelSerializer):
 
 class TrackingExperienceDataSerializer(serializers.ModelSerializer):
     """
-    Complete serializer for Unity as requested by metadata instruction.
-    Maps TrackingImage fields + related video info.
+    Complete serializer for Unity as requested by metadata instruction and activation spec.
+    Maps TrackingImage fields + related video info + PIN/QR code.
     """
     name = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField()
     image_url = serializers.SerializerMethodField()
+    video = serializers.SerializerMethodField()
     video_url = serializers.SerializerMethodField()
+    qr_code_url = serializers.SerializerMethodField()
 
     class Meta:
         model = TrackingImage
         fields = [
             'id', 'name', 'title', 'description',
-            'image_url', 'video_url', 'physical_width',
-            'resolution', 'image_size', 'video_size', 'is_public',
-            'is_active', 'created_at', 'updated_at'
+            'activation_pin', 'qr_code_url',
+            'image', 'image_url', 'video', 'video_url',
+            'aspect_ratio', 'width', 'height', 'file_size',
+            'physical_width', 'resolution', 'image_size', 'video_size',
+            'is_public', 'is_active', 'created_at', 'updated_at'
         ]
 
     def get_name(self, obj):
@@ -103,10 +142,23 @@ class TrackingExperienceDataSerializer(serializers.ModelSerializer):
             return request.build_absolute_uri(obj.image.url)
         return None
 
+    def get_image(self, obj):
+        return self.get_image_url(obj)
+
     def get_video_url(self, obj):
         request = self.context.get('request')
         if hasattr(obj, 'video') and obj.video and obj.video.video and request:
             return request.build_absolute_uri(obj.video.video.url)
+        return None
+
+    def get_video(self, obj):
+        return self.get_video_url(obj)
+
+    def get_qr_code_url(self, obj):
+        request = self.context.get('request')
+        ensure_qr_code(obj)
+        if obj.qr_code_image and request:
+            return request.build_absolute_uri(obj.qr_code_image.url)
         return None
 
 

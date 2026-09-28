@@ -1,7 +1,10 @@
 import os
+import random
 from io import BytesIO
 from PIL import Image
+import qrcode
 from django.core.files import File
+from django.core.files.base import ContentFile
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
@@ -45,9 +48,20 @@ def validate_aspect_ratio(instance, value):
         raise ValidationError(f"La imagen no coincide con el formato {instance.aspect_ratio} seleccionado.")
 
 
+def generate_unique_pin():
+    """Genera un PIN de 6 caracteres alfanuméricos legibles (sin 0, O, 1, I)."""
+    chars = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ"
+    return ''.join(random.choices(chars, k=6))
+
+
 def tracking_image_upload_path(instance, filename):
     base_name = os.path.splitext(filename)[0]
     return os.path.join('tracking', str(instance.user.id), 'images', f"{base_name}.jpg")
+
+
+def tracking_qr_code_upload_path(instance, filename):
+    pin = instance.activation_pin or 'qr'
+    return os.path.join('tracking', str(instance.user.id), 'qrcodes', f"qr_{pin}.png")
 
 
 def tracking_video_upload_path(instance, filename):
@@ -72,6 +86,22 @@ class TrackingImage(models.Model):
         validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'webp']), validate_image_size],
         help_text='Target image for AR tracking. Se convertirá automáticamente a JPG optimizado.'
     )
+
+    # --- Activación Móvil (PIN y QR) ---
+    activation_pin = models.CharField(
+        max_length=20,
+        unique=True,
+        null=True,
+        blank=True,
+        db_index=True,
+        help_text="PIN único para desbloquear la experiencia desde la app móvil"
+    )
+    qr_code_image = models.ImageField(
+        upload_to=tracking_qr_code_upload_path,
+        null=True,
+        blank=True,
+        help_text="Imagen del código QR generado para activación en la app"
+    )
     
     # --- Technical Metadata ---
     file_size = models.PositiveIntegerField(null=True, blank=True, help_text="Peso en bytes de la imagen optimizada")
@@ -95,7 +125,32 @@ class TrackingImage(models.Model):
             validate_aspect_ratio(self, self.image)
 
     def save(self, *args, **kwargs):
-        if self.image:
+        # 1. Asegurar PIN único
+        if not self.activation_pin:
+            pin = generate_unique_pin()
+            while TrackingImage.objects.filter(activation_pin=pin).exclude(pk=self.pk).exists():
+                pin = generate_unique_pin()
+            self.activation_pin = pin
+
+        # 2. Generar código QR si no existe
+        if self.activation_pin and not self.qr_code_image:
+            qr = qrcode.QRCode(
+                version=1,
+                error_correction=qrcode.constants.ERROR_CORRECT_M,
+                box_size=10,
+                border=4,
+            )
+            qr.add_data(self.activation_pin)
+            qr.make(fit=True)
+            qr_img = qr.make_image(fill_color="black", back_color="white")
+
+            qr_output = BytesIO()
+            qr_img.save(qr_output, format='PNG')
+            qr_output.seek(0)
+            self.qr_code_image = ContentFile(qr_output.read(), name=f"qr_{self.activation_pin}.png")
+
+        # 3. Optimización de imagen de tracking (solo si es nueva/no guardada aún)
+        if self.image and not getattr(self.image, '_committed', False):
             img = Image.open(self.image)
             
             if img.mode in ("RGBA", "P"):

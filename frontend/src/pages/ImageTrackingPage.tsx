@@ -6,6 +6,7 @@ import ProgressBar from "../components/ui/ProgressBar";
 import CompletedItem from "../components/ui/CompletedItem";
 import ToggleSwitch from "../components/ui/ToggleSwitch";
 import NeonButton from "../components/ui/NeonButton";
+import ActivationKitModal from "../components/common/ActivationKitModal";
 import {
   createTrackingImage,
   setTrackingImageVisibility,
@@ -53,6 +54,8 @@ export default function ImageTrackingPage() {
   const [updatingVisibility, setUpdatingVisibility] = useState<number | null>(
     null
   );
+  const [selectedKitProject, setSelectedKitProject] = useState<TrackingImage | null>(null);
+  const [isKitOpen, setIsKitOpen] = useState(false);
 
   // Fetch projects on load
   useEffect(() => {
@@ -167,15 +170,21 @@ export default function ImageTrackingPage() {
       videoData.append("title", state.videoFile.name);
 
       setState((prev) => ({ ...prev, progress: 70 }));
-      await uploadTrackingVideo(imageResult.id, videoData);
+      const { data: updatedProject } = await uploadTrackingVideo(imageResult.id, videoData);
 
       setState((prev) => ({ ...prev, progress: 100 }));
 
       // Refresh list
       const { data } = await getTrackingImages();
-      setProjects(Array.isArray(data) ? data : data.results || []);
+      const updatedList: TrackingImage[] = Array.isArray(data) ? data : data.results || [];
+      setProjects(updatedList);
 
       toast.success("¡Proyecto AR subido exitosamente!");
+
+      // Open the Activation Kit Modal automatically for the newly created project
+      const createdItem = updatedList.find((p: TrackingImage) => p.id === imageResult.id) || updatedProject || imageResult;
+      setSelectedKitProject(createdItem);
+      setIsKitOpen(true);
 
       // Reset form
       setTimeout(() => {
@@ -681,6 +690,11 @@ export default function ImageTrackingPage() {
                 <CompletedItem
                   filename={project.title}
                   thumbnailUrl={project.image_url}
+                  pin={project.activation_pin}
+                  onOpenKit={() => {
+                    setSelectedKitProject(project);
+                    setIsKitOpen(true);
+                  }}
                   meta={`${project.aspect_ratio} • ${
                     project.is_public ? "🌐 Cloud" : "🔒 Private"
                   } • ${new Date(project.created_at).toLocaleDateString()}`}
@@ -707,6 +721,16 @@ export default function ImageTrackingPage() {
           )}
         </div>
       </section>
+
+      {/* Kit de Activación Modal */}
+      <ActivationKitModal
+        isOpen={isKitOpen}
+        onClose={() => {
+          setIsKitOpen(false);
+          setSelectedKitProject(null);
+        }}
+        project={selectedKitProject}
+      />
     </div>
   );
 }

@@ -197,7 +197,7 @@ def unity_tracking_catalog(request):
     """
     images = (
         TrackingImage.objects
-        .filter(is_public=True)
+        .filter(is_public=True, is_active=True)
         .select_related('video')
     )
     serializer = TrackingExperienceDataSerializer(
@@ -207,3 +207,35 @@ def unity_tracking_catalog(request):
         'count': images.count(),
         'results': serializer.data,
     })
+
+
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
+def tracking_experience_activate(request):
+    """
+    POST /api/tracking/activate/
+    Activate and unlock an AR experience using a PIN code or QR scan from Unity mobile app.
+    No authentication required (AllowAny).
+    Body: { "code": "784920" }
+    """
+    code = request.data.get('code', '').strip().upper()
+    if not code:
+        return Response(
+            {'detail': 'Código no proporcionado.'},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    try:
+        experience = (
+            TrackingImage.objects
+            .select_related('video')
+            .get(activation_pin__iexact=code, is_active=True)
+        )
+    except TrackingImage.DoesNotExist:
+        return Response(
+            {'detail': 'Código no válido o experiencia inactiva.'},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    serializer = TrackingExperienceDataSerializer(experience, context={'request': request})
+    return Response(serializer.data, status=status.HTTP_200_OK)
