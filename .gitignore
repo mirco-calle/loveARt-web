@@ -67,4 +67,5 @@ BACKEND_PIN_QR_SPEC.md
 
 # AI Agent Context & Skills
 AGENTS.md
+MEMORY.md
 .agents/
