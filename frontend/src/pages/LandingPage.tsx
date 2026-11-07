@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { toast } from "react-toastify";
 import { ROUTES } from "../routes/routes";
 import NeonButton from "../components/ui/NeonButton";
 import GlassCard from "../components/ui/GlassCard";
@@ -54,10 +55,11 @@ export default function LandingPage() {
   }, []);
 
   const handleDownload = () => {
-    if (latestBuild?.apk_file) {
-      window.open(latestBuild.apk_file, "_blank");
+    const downloadUrl = CoreAPI.getDownloadUrl(latestBuild);
+    if (downloadUrl) {
+      window.location.href = downloadUrl;
     } else {
-      alert("La aplicación no está disponible temporalmente.");
+      toast.info("La aplicación móvil estará disponible muy pronto para descarga.");
     }
   };
 

@@ -64,3 +64,7 @@ GEMINI.md
 DEPLOY_AZURE.md
 docker-compose.yml
 BACKEND_PIN_QR_SPEC.md
+
+# AI Agent Context & Skills
+AGENTS.md
+.agents/

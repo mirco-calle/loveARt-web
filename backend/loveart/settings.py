@@ -22,11 +22,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-%cphr=1tcxii@eyiaqi0u5j@b1ww)4c+#-9k3ifwh8dopil-uv')
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = os.environ.get('SECRET_KEY')
+if not SECRET_KEY:
+    if DEBUG:
+        SECRET_KEY = 'django-insecure-%cphr=1tcxii@eyiaqi0u5j@b1ww)4c+#-9k3ifwh8dopil-uv'
+    else:
+        raise ValueError("CRITICAL SECURITY ERROR: SECRET_KEY environment variable is missing in production (DEBUG=False).")
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
 
@@ -97,6 +102,15 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '300/day',
+        'user': '3000/day',
+        'activation_pin': '10/minute',
+    },
 }
 
 # ============================================
@@ -235,7 +249,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # ============================================
 # FILE UPLOAD LIMITS
 # ============================================
-DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600    # 100 MB — max POST body size
+DATA_UPLOAD_MAX_MEMORY_SIZE = 262144000    # 250 MB — max POST body size (aligns with MAX_APK_SIZE_MB = 250)
 FILE_UPLOAD_MAX_MEMORY_SIZE = 0            # 0 = stream directly to /tmp (no RAM buffering)
                                            # Critical for large APK uploads on 1GB RAM VM
 

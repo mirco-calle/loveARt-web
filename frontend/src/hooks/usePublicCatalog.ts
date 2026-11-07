@@ -1,33 +1,19 @@
-import { useState, useEffect } from "react";
 import { getUnityTrackingCatalog, TrackingExperienceData } from "../api/ImageTracking";
+import { useAsyncList } from "./useAsyncList";
 
+/**
+ * Hook to retrieve public demo tracking experiences for the catalog.
+ */
 export const usePublicCatalog = () => {
-  const [trackingItems, setTrackingItems] = useState<TrackingExperienceData[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchCatalog = async () => {
-    setIsLoading(true);
-    try {
-      const trackingRes = await getUnityTrackingCatalog();
-      setTrackingItems(trackingRes.data.results);
-      setError(null);
-    } catch (err) {
-      console.error("Error fetching public catalog:", err);
-      setError("No se pudo cargar el catálogo público.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchCatalog();
-  }, []);
+  const { items, isLoading, error, refresh } = useAsyncList<TrackingExperienceData>(
+    getUnityTrackingCatalog,
+    "No se pudo cargar el catálogo público."
+  );
 
   return {
-    trackingItems,
+    trackingItems: items,
     isLoading,
     error,
-    refresh: fetchCatalog,
+    refresh,
   };
 };

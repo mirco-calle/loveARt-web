@@ -1,5 +1,5 @@
 import os
-import random
+import secrets
 from io import BytesIO
 from PIL import Image
 import qrcode
@@ -14,6 +14,18 @@ from django.core.files.images import get_image_dimensions
 # Constantes de optimización
 MAX_IMAGE_SIZE_MB = 2 
 MAX_VIDEO_SIZE_MB = 50
+
+# Alfabeto legible sin caracteres ambiguos (sin 0, O, 1, I)
+PIN_CHARSET = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ"
+
+# Mapa de relaciones de aspecto objetivo
+ASPECT_RATIO_TARGETS = {
+    '16:9': 16 / 9,
+    '9:16': 9 / 16,
+    '1:1': 1.0,
+    '4:3': 4 / 3,
+    '940:788': 940 / 788,
+}
 
 def validate_image_size(value):
     filesize = value.size
@@ -31,27 +43,16 @@ def validate_aspect_ratio(instance, value):
         return
     
     aspect_ratio = width / height
-    
-    # Mapa de relaciones de aspecto objetivo
-    ratios = {
-        '16:9': 16 / 9,
-        '9:16': 9 / 16,
-        '1:1': 1.0,
-        '4:3': 4 / 3,
-        '940:788': 940 / 788,
-    }
-    
-    target = ratios.get(instance.aspect_ratio, 16/9)
+    target = ASPECT_RATIO_TARGETS.get(instance.aspect_ratio, 16 / 9)
     tolerance = 0.2 
     
     if not (target - tolerance <= aspect_ratio <= target + tolerance):
         raise ValidationError(f"La imagen no coincide con el formato {instance.aspect_ratio} seleccionado.")
 
 
-def generate_unique_pin():
-    """Genera un PIN de 6 caracteres alfanuméricos legibles (sin 0, O, 1, I)."""
-    chars = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ"
-    return ''.join(random.choices(chars, k=6))
+def generate_unique_pin(length=6) -> str:
+    """Genera un PIN alfanumérico seguro y legible (sin 0, O, 1, I)."""
+    return ''.join(secrets.choice(PIN_CHARSET) for _ in range(length))
 
 
 def tracking_image_upload_path(instance, filename):

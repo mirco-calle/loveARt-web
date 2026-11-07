@@ -1,7 +1,12 @@
 from rest_framework import status, permissions
-from rest_framework.decorators import api_view, permission_classes, parser_classes
+from rest_framework.decorators import api_view, permission_classes, parser_classes, throttle_classes
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
+from rest_framework.throttling import AnonRateThrottle
+
+class ActivationPinRateThrottle(AnonRateThrottle):
+    scope = 'activation_pin'
+    rate = '10/minute'
 
 from image_tracking.models import TrackingImage, TrackingVideo
 from image_tracking.api.serializers import (
@@ -208,6 +213,7 @@ def unity_tracking_catalog(request):
 
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
+@throttle_classes([ActivationPinRateThrottle])
 def tracking_experience_activate(request):
     """
     POST /api/tracking/activate/

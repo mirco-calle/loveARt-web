@@ -1,33 +1,19 @@
-import { useState, useEffect } from "react";
 import { getUnityTrackingMe, TrackingExperienceData } from "../api/ImageTracking";
+import { useAsyncList } from "./useAsyncList";
 
+/**
+ * Hook to retrieve tracking experiences belonging to the authenticated user.
+ */
 export const useMyExperiences = () => {
-  const [trackingItems, setTrackingItems] = useState<TrackingExperienceData[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchMyData = async () => {
-    setIsLoading(true);
-    try {
-      const trackingRes = await getUnityTrackingMe();
-      setTrackingItems(trackingRes.data.results);
-      setError(null);
-    } catch (err) {
-      console.error("Error fetching my experiences:", err);
-      setError("No se pudo cargar tus experiencias.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchMyData();
-  }, []);
+  const { items, isLoading, error, refresh } = useAsyncList<TrackingExperienceData>(
+    getUnityTrackingMe,
+    "No se pudo cargar tus experiencias."
+  );
 
   return {
-    trackingItems,
+    trackingItems: items,
     isLoading,
     error,
-    refresh: fetchMyData,
+    refresh,
   };
 };
