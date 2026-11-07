@@ -18,23 +18,26 @@ const CoreAPI = {
 
   /**
    * Resolves the full downloadable APK URL.
-   * If the backend returns a relative URL, it prefixes the backend domain
-   * instead of resolving against Netlify.
+   * Prioritizes the streaming endpoint (/api/core/download-latest-apk/)
+   * ensuring Android devices get an attachment download with proper headers.
    */
   getDownloadUrl: (build?: AppBuild | null): string => {
     if (!build) return "";
-    const rawUrl = build.download_url || build.apk_file;
-    if (!rawUrl) return "";
-
-    if (rawUrl.startsWith("http://") || rawUrl.startsWith("https://")) {
-      return rawUrl;
-    }
 
     const backendBase = (
       import.meta.env.VITE_API_URL || "http://localhost:8000/api"
     ).replace(/\/api\/?$/, "");
 
-    return `${backendBase}${rawUrl.startsWith("/") ? "" : "/"}${rawUrl}`;
+    // 1. Si el backend envió una URL absoluta directa de descarga
+    if (build.download_url) {
+      if (build.download_url.startsWith("http://") || build.download_url.startsWith("https://")) {
+        return build.download_url;
+      }
+      return `${backendBase}${build.download_url.startsWith("/") ? "" : "/"}${build.download_url}`;
+    }
+
+    // 2. Endpoint dedicado de streaming de la última build
+    return `${backendBase}/api/core/download-latest-apk/`;
   },
 };
 
